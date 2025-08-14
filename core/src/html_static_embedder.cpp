@@ -1,9 +1,22 @@
 #include "html_static_embedder.h"
 
+#include <fstream>
 #include <iostream>
 #include <vector>
 
-void hse::HTMLStaticEmbedder::load_html_from_file(const std::string &path) {}
+void hse::HTMLStaticEmbedder::load_html_from_file(const std::string &path) {
+    std::ifstream file(path);
+
+    if (!file.is_open()) {
+        std::cerr << "Error: Can't open file: " << path << '\n';
+        return;
+    }
+
+    std::string data = std::string(std::istreambuf_iterator<char>(file),
+                                  std::istreambuf_iterator<char>());
+
+    raw_html_data = std::move(data);
+}
 
 #ifdef WIN32
 void hse::HTMLStaticEmbedder::load_html_from_res(int id) {
@@ -15,7 +28,7 @@ std::string hse::HTMLStaticEmbedder::get_raw_html_data() const {
     return raw_html_data;
 }
 
-std::string hse::HTMLStaticEmbedder::get_processed_html_data() const { 
+std::string hse::HTMLStaticEmbedder::get_processed_html_data() const {
     return processed_html_data;
 }
 
