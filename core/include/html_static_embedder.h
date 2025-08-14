@@ -2,6 +2,7 @@
 #define HSE_HTML_STATIC_EMBEDDER_H
 
 #include <string>
+#include <optional>
 
 #ifdef WIN32
 #include <Windows.h>
@@ -29,7 +30,7 @@ class HTMLStaticEmbedder {
     std::string processed_html_data;
 
 #ifdef WIN32
-    std::string load_res(int id, LPCSTR type);
+    std::optional<std::string> load_res(int id, LPCSTR type);
 #endif  // WIN32
 
     void remove_all_cr();

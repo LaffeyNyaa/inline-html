@@ -22,20 +22,31 @@ void hse::HTMLStaticEmbedder::load_html_from_file(const std::string &path) {
 
 #ifdef WIN32
 void hse::HTMLStaticEmbedder::load_html_from_res(int id) {
-    raw_html_data = std::move(load_res(id, RT_HTML));
+    auto result = load_res(id, RT_HTML);
 
+    if (!result.has_value()) {
+        std::cerr << "Error loading resource " << id << '\n';
+        return;
+    }
+
+    raw_html_data = std::move(*result);
     remove_all_cr();
 }
 #endif  // WIN32
 
 #ifdef WIN32
-std::string hse::HTMLStaticEmbedder::load_res(int id, LPCSTR type) {
+std::optional<std::string> hse::HTMLStaticEmbedder::load_res(int id,
+                                                             LPCSTR type) {
     HMODULE module = GetModuleHandle(nullptr);
     LPSTR int_res = MAKEINTRESOURCE(id);
     HRSRC handle = FindResource(module, int_res, type);
     HGLOBAL loaded = LoadResource(module, handle);
     LPVOID data = LockResource(loaded);
     DWORD size = SizeofResource(module, handle);
+
+    if (GetLastError() != ERROR_SUCCESS) {
+        return std::nullopt;
+    }
 
     const char *res_data_p = static_cast<const char *>(data);
     std::string res_data = std::string(res_data_p, size);
