@@ -1,0 +1,5 @@
+#include "resource.h"
+
+IDR_HTML_INDEX HTML "../res/index.html"
+IDR_CSS_STYLE RCDATA "../res/style.css"
+IDR_JS_SCRIPT RCDATA "../res/script.js"

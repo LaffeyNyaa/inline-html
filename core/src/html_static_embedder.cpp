@@ -1,0 +1,37 @@
+#include "html_static_embedder.h"
+
+#include <iostream>
+#include <vector>
+
+void hse::HTMLStaticEmbedder::load_html_from_file(const std::string &path) {}
+
+#ifdef WIN32
+void hse::HTMLStaticEmbedder::load_html_from_res(int id) {
+    raw_html_data = load_res(id, RT_HTML);
+}
+#endif  // WIN32
+
+std::string hse::HTMLStaticEmbedder::get_raw_html_data() const {
+    return raw_html_data;
+}
+
+std::string hse::HTMLStaticEmbedder::get_processed_html_data() const { 
+    return processed_html_data;
+}
+
+#ifdef WIN32
+std::string hse::HTMLStaticEmbedder::load_res(int id, LPCSTR type) {
+    HMODULE module = GetModuleHandle(nullptr);
+    LPSTR int_res = MAKEINTRESOURCE(id);
+    HRSRC handle = FindResource(module, int_res, type);
+    HGLOBAL loaded = LoadResource(module, handle);
+    LPVOID data = LockResource(loaded);
+    DWORD size = SizeofResource(module, handle);
+
+    const char *res_data_p = static_cast<const char *>(data);
+    std::string res_data = std::string(res_data_p, size);
+
+    return res_data;
+}
+
+#endif  // WIN32
