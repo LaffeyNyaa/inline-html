@@ -1,7 +1,5 @@
 #include <html_static_embedder.h>
 
-#include <iostream>
-
 #include "resource.h"
 
 std::string target_data =
