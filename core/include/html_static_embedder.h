@@ -1,5 +1,5 @@
-#ifndef HTML_STATIC_EMBEDDER_H
-#define HTML_STATIC_EMBEDDER_H
+#ifndef HSE_HTML_STATIC_EMBEDDER_H
+#define HSE_HTML_STATIC_EMBEDDER_H
 
 #include <string>
 
@@ -36,4 +36,4 @@ class HTMLStaticEmbedder {
 };
 }  // namespace hse
 
-#endif  // HTML_STATIC_EMBEDDER_H
+#endif  // HSE_HTML_STATIC_EMBEDDER_H
