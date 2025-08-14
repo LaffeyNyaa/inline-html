@@ -13,7 +13,7 @@ class HTMLStaticEmbedder {
    public:
     HTMLStaticEmbedder() = default;
 
-    void load_html_from_file(const std::string &path);
+    void load_html_from_file(std::string_view);
 
 #ifdef WIN32
     void load_html_from_res(int id);
@@ -28,6 +28,8 @@ class HTMLStaticEmbedder {
    private:
     std::string raw_html_data;
     std::string processed_html_data;
+
+    std::optional<std::string> load_file(std::string_view path);
 
 #ifdef WIN32
     std::optional<std::string> load_res(int id, LPCSTR type);

@@ -4,18 +4,14 @@
 #include <iostream>
 #include <vector>
 
-void hse::HTMLStaticEmbedder::load_html_from_file(const std::string &path) {
-    std::ifstream file(path);
-
-    if (!file.is_open()) {
-        std::cerr << "Error: Can't open file: " << path << '\n';
+void hse::HTMLStaticEmbedder::load_html_from_file(std::string_view path) {
+    auto result = load_file(path);
+    if (!result.has_value()) {
+        std::cerr << "Error loading file " << path << '\n';
         return;
     }
 
-    std::string data = std::string(std::istreambuf_iterator<char>(file),
-                                   std::istreambuf_iterator<char>());
-
-    raw_html_data = std::move(data);
+    raw_html_data = std::move(*result);
 
     remove_all_cr();
 }
@@ -33,6 +29,21 @@ void hse::HTMLStaticEmbedder::load_html_from_res(int id) {
     remove_all_cr();
 }
 #endif  // WIN32
+
+std::optional<std::string> hse::HTMLStaticEmbedder::load_file(
+    std::string_view path) {
+    const char *path_data = path.data();
+    std::ifstream file(path_data);
+
+    if (!file.is_open()) {
+        return std::nullopt;
+    }
+
+    std::string data = std::string(std::istreambuf_iterator<char>(file),
+                                   std::istreambuf_iterator<char>());
+
+    return data;
+}
 
 #ifdef WIN32
 std::optional<std::string> hse::HTMLStaticEmbedder::load_res(int id,
