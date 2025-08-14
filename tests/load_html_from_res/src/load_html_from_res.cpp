@@ -2,23 +2,20 @@
 
 #include "resource.h"
 
-
-std::string target_data =
-    "<!DOCTYPE html>\r\n"
-    "<html lang=\"en\">\r\n"
-    "<head>\r\n"
-    "    <meta charset=\"UTF-8\">\r\n"
-    "    <meta name=\"viewport\" content=\"width=device-width, "
-    "initial-scale=1.0\">\r\n"
-    "    <link rel=\"stylesheet\" href=\"style.css\">\r\n"
-    "    <script src=\"script.js\"></script>\r\n"
-    "    <title>Document</title>\r\n"
-    "</head>\r\n"
-    "<body>\r\n"
-    "    <button onclick=\"showAlert()\">Click Me!</button>\r\n"
-    "</body>\r\n"
-    "</html>\r\n";
-
+std::string target_data = R"html(<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js"></script>
+    <title>Document</title>
+</head>
+<body>
+    <button onclick="showAlert()">Click Me!</button>
+</body>
+</html>
+)html";
 int main() {
     hse::HTMLStaticEmbedder embedder;
     embedder.load_html_from_res(IDR_HTML_INDEX);

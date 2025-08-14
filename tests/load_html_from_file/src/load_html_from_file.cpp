@@ -2,21 +2,20 @@
 
 #include "resource.h"
 
-std::string target_data =
-    "<!DOCTYPE html>\n"
-    "<html lang=\"en\">\n"
-    "<head>\n"
-    "    <meta charset=\"UTF-8\">\n"
-    "    <meta name=\"viewport\" content=\"width=device-width, "
-    "initial-scale=1.0\">\n"
-    "    <link rel=\"stylesheet\" href=\"style.css\">\n"
-    "    <script src=\"script.js\"></script>\n"
-    "    <title>Document</title>\n"
-    "</head>\n"
-    "<body>\n"
-    "    <button onclick=\"showAlert()\">Click Me!</button>\n"
-    "</body>\n"
-    "</html>\n";
+std::string target_data = R"html(<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js"></script>
+    <title>Document</title>
+</head>
+<body>
+    <button onclick="showAlert()">Click Me!</button>
+</body>
+</html>
+)html";
 
 int main() {
     hse::HTMLStaticEmbedder embedder;
