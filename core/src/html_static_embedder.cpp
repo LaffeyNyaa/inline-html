@@ -13,14 +13,18 @@ void hse::HTMLStaticEmbedder::load_html_from_file(const std::string &path) {
     }
 
     std::string data = std::string(std::istreambuf_iterator<char>(file),
-                                  std::istreambuf_iterator<char>());
+                                   std::istreambuf_iterator<char>());
 
     raw_html_data = std::move(data);
+
+    remove_all_cr();
 }
 
 #ifdef WIN32
 void hse::HTMLStaticEmbedder::load_html_from_res(int id) {
     raw_html_data = std::move(load_res(id, RT_HTML));
+
+    remove_all_cr();
 }
 #endif  // WIN32
 
@@ -48,3 +52,9 @@ std::string hse::HTMLStaticEmbedder::load_res(int id, LPCSTR type) {
 }
 
 #endif  // WIN32
+
+void hse::HTMLStaticEmbedder::remove_all_cr() {
+    std::string::iterator iter =
+        std::remove(raw_html_data.begin(), raw_html_data.end(), '\r');
+    raw_html_data.erase(iter, raw_html_data.end());
+}

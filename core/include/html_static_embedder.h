@@ -28,6 +28,8 @@ class HTMLStaticEmbedder {
 #ifdef WIN32
     std::string load_res(int id, LPCSTR type);
 #endif  // WIN32
+
+    void remove_all_cr();
 };
 }  // namespace hse
 
