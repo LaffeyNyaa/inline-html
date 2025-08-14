@@ -20,7 +20,7 @@ void hse::HTMLStaticEmbedder::load_html_from_file(const std::string &path) {
 
 #ifdef WIN32
 void hse::HTMLStaticEmbedder::load_html_from_res(int id) {
-    raw_html_data = load_res(id, RT_HTML);
+    raw_html_data = std::move(load_res(id, RT_HTML));
 }
 #endif  // WIN32
 
