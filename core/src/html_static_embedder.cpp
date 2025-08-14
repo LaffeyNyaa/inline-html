@@ -54,7 +54,6 @@ std::string hse::HTMLStaticEmbedder::load_res(int id, LPCSTR type) {
 #endif  // WIN32
 
 void hse::HTMLStaticEmbedder::remove_all_cr() {
-    std::string::iterator iter =
-        std::remove(raw_html_data.begin(), raw_html_data.end(), '\r');
+    auto iter = std::remove(raw_html_data.begin(), raw_html_data.end(), '\r');
     raw_html_data.erase(iter, raw_html_data.end());
 }
