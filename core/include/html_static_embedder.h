@@ -18,8 +18,11 @@ class HTMLStaticEmbedder {
     void load_html_from_res(int id);
 #endif  // WINDOWS
 
-    std::string get_raw_html_data() const;
-    std::string get_processed_html_data() const;
+    inline std::string get_raw_html_data() const { return raw_html_data; }
+
+    inline std::string get_processed_html_data() const {
+        return processed_html_data;
+    }
 
    private:
     std::string raw_html_data;

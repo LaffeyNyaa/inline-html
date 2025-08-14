@@ -28,14 +28,6 @@ void hse::HTMLStaticEmbedder::load_html_from_res(int id) {
 }
 #endif  // WIN32
 
-std::string hse::HTMLStaticEmbedder::get_raw_html_data() const {
-    return raw_html_data;
-}
-
-std::string hse::HTMLStaticEmbedder::get_processed_html_data() const {
-    return processed_html_data;
-}
-
 #ifdef WIN32
 std::string hse::HTMLStaticEmbedder::load_res(int id, LPCSTR type) {
     HMODULE module = GetModuleHandle(nullptr);
