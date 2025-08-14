@@ -16,7 +16,7 @@ class HTMLStaticEmbedder {
 
 #ifdef WIN32
     void load_html_from_res(int id);
-#endif  // WINDOWS
+#endif  // WIN32
 
     inline std::string get_raw_html_data() const { return raw_html_data; }
 
