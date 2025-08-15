@@ -22,33 +22,11 @@
  * SOFTWARE.
  */
 
-#include <html_static_embedder.h>
+#ifndef RESOURCE_H
+#define RESOURCE_H
 
-#include "resource.h"
+#define IDR_HTML_INDEX 101
+#define IDR_CSS_STYLE 102
+#define IDR_JS_SCRIPT 103
 
-const std::string target_data = R"delimiter(<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
-    <script src="script.js"></script>
-    <title>Document</title>
-</head>
-<body>
-    <button onclick="showAlert()">Click Me!</button>
-</body>
-</html>
-)delimiter";
-
-int main() {
-    hse::HTMLStaticEmbedder embedder;
-    embedder.load_html_from_file("res/index.html");
-    std::string html_data = embedder.get_html_data();
-
-    if (html_data != target_data) {
-        return 1;
-    }
-
-    return 0;
-}
+#endif

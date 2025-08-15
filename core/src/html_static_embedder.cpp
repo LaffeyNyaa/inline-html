@@ -28,13 +28,15 @@
 #include <iostream>
 #include <vector>
 
-void hse::HTMLStaticEmbedder::load_html_from_file(std::string_view path) noexcept {
+void hse::HTMLStaticEmbedder::load_html_from_file(
+    const std::string &path) noexcept {
     auto result = load_file(path);
     if (!result.has_value()) {
         std::cerr << "Error loading file " << path << '\n';
         return;
     }
 
+    get_path_prefix(path);
     html_data = std::move(*result);
 
     remove_all_cr();
@@ -53,10 +55,31 @@ void hse::HTMLStaticEmbedder::load_html_from_res(int id) noexcept {
 }
 #endif  // WIN32
 
+void hse::HTMLStaticEmbedder::embed_static_from_files() noexcept {
+    std::string css_pattern =
+        R"(<link[^>]*rel=["']stylesheet["'][^>]*href=["']([^"']*)["'][^>]*>)";
+    auto css_matches_result = read_matches(css_pattern);
+
+    if (css_matches_result.has_value()) {
+        embed_css_files_with_matches(*css_matches_result);
+    }
+
+    std::string js_pattern = R"(<script[^>]*src=["']([^"']*)["'][^>]*></script>)";
+    auto js_matches_result = read_matches(js_pattern);
+
+    if (js_matches_result.has_value()) {
+        embed_js_files_with_matches(*js_matches_result);
+    }
+
+    remove_all_cr();
+}
+
+#ifdef WIN32
+void hse::HTMLStaticEmbedder::embed_static_from_res() noexcept {}
+#endif  // WIN32
 std::optional<std::string> hse::HTMLStaticEmbedder::load_file(
-    std::string_view path) noexcept {
-    auto path_data = path.data();
-    std::ifstream file(path_data);
+    const std::string &path) noexcept {
+    std::ifstream file(path);
 
     if (!file.is_open()) {
         return std::nullopt;
@@ -69,8 +92,8 @@ std::optional<std::string> hse::HTMLStaticEmbedder::load_file(
 }
 
 #ifdef WIN32
-std::optional<std::string> hse::HTMLStaticEmbedder::load_res(int id,
-                                                             LPCSTR type) noexcept {
+std::optional<std::string> hse::HTMLStaticEmbedder::load_res(
+    int id, LPCSTR type) noexcept {
     HMODULE module = GetModuleHandle(nullptr);
     LPSTR int_res = MAKEINTRESOURCE(id);
     HRSRC handle = FindResource(module, int_res, type);
@@ -89,11 +112,89 @@ std::optional<std::string> hse::HTMLStaticEmbedder::load_res(int id,
 }
 #endif  // WIN32
 
+void hse::HTMLStaticEmbedder::get_path_prefix(
+    const std::string &path) noexcept {
+    auto pos = path.find_last_of('/');
+
+    if (pos == std::string::npos) {
+        pos = path.find_last_of('\\');
+    }
+
+    if (pos == std::string::npos) {
+        path_prefix = "";
+        return;
+    }
+
+    path_prefix = path.substr(0, pos + 1);
+}
+
 void hse::HTMLStaticEmbedder::remove_all_cr() noexcept {
     auto iter = std::remove(html_data.begin(), html_data.end(), '\r');
     html_data.erase(iter, html_data.end());
 }
 
-void hse::HTMLStaticEmbedder::embed_static() noexcept {
+std::optional<std::vector<std::smatch>> hse::HTMLStaticEmbedder::read_matches(
+    const std::string &pattern) noexcept {
+    std::vector<std::smatch> matches;
+    std::regex regex(pattern, std::regex_constants::icase);
+    std::sregex_iterator begin(html_data.begin(), html_data.end(), regex);
+    std::sregex_iterator end;
 
+    for (auto iter = begin; iter != end; ++iter) {
+        matches.emplace_back(*iter);
+    }
+
+    if (matches.empty()) {
+        return std::nullopt;
+    }
+
+    return std::move(matches);
+}
+
+void hse::HTMLStaticEmbedder::embed_css_files_with_matches(
+    const std::vector<std::smatch> &matches) noexcept {
+    auto rbegin = matches.rbegin();
+    auto rend = matches.rend();
+
+    for (auto iter = rbegin; iter != rend; ++iter) {
+        auto pos = iter->position();
+        auto filename = (*iter)[1].str();
+        auto full = (*iter)[0].str();
+        auto path = path_prefix + filename;
+        auto data_result = load_file(path);
+
+        if (!data_result.has_value()) {
+            std::cerr << "Error loading file " << path << '\n';
+            continue;
+        }
+
+        auto data = "<style>" + *data_result + "</style>";
+
+        auto len = full.size();
+        html_data.replace(pos, len, data);
+    }
+}
+
+void hse::HTMLStaticEmbedder::embed_js_files_with_matches(
+    const std::vector<std::smatch> &matches) noexcept {
+    auto rbegin = matches.rbegin();
+    auto rend = matches.rend();
+
+    for (auto iter = rbegin; iter != rend; ++iter) {
+        auto pos = iter->position();
+        auto filename = (*iter)[1].str();
+        auto full = (*iter)[0].str();
+        auto path = path_prefix + filename;
+        auto data_result = load_file(path);
+
+        if (!data_result.has_value()) {
+            std::cerr << "Error loading file " << path << '\n';
+            continue;
+        }
+
+        auto data = "<script>" + *data_result + "</script>";
+
+        auto len = full.size();
+        html_data.replace(pos, len, data);
+    }
 }

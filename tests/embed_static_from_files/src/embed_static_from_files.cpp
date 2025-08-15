@@ -24,6 +24,8 @@
 
 #include <html_static_embedder.h>
 
+#include <iostream>
+
 #include "resource.h"
 
 const std::string target_data = R"delimiter(<!DOCTYPE html>
@@ -31,8 +33,14 @@ const std::string target_data = R"delimiter(<!DOCTYPE html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
-    <script src="script.js"></script>
+    <style>button {
+    border-radius: 8px; /* Adjust this value to control the roundness of corners */
+    background-color: aqua;
+    color: white;
+}</style>
+    <script>function showAlert() {
+    alert("You cliked me!");
+}</script>
     <title>Document</title>
 </head>
 <body>
@@ -44,7 +52,8 @@ const std::string target_data = R"delimiter(<!DOCTYPE html>
 int main() {
     hse::HTMLStaticEmbedder embedder;
     embedder.load_html_from_file("res/index.html");
-    std::string html_data = embedder.get_html_data();
+    embedder.embed_static_from_files();
+    auto html_data = embedder.get_html_data();
 
     if (html_data != target_data) {
         return 1;

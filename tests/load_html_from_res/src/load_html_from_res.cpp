@@ -44,9 +44,9 @@ const std::string target_data = R"delimiter(<!DOCTYPE html>
 int main() {
     hse::HTMLStaticEmbedder embedder;
     embedder.load_html_from_res(IDR_HTML_INDEX);
-    std::string raw_html_data = embedder.get_html_data();
+    std::string html_data = embedder.get_html_data();
 
-    if (raw_html_data != target_data) {
+    if (html_data != target_data) {
         return 1;
     }
 
