@@ -22,48 +22,11 @@
  * SOFTWARE.
  */
 
-#include <html_static_embedder.h>
+#ifndef RESOURCE_H
+#define RESOURCE_H
 
-#include <map>
+#define IDR_HTML_INDEX 101
+#define IDR_CSS_STYLE 102
+#define IDR_JS_SCRIPT 103
 
-#include "resource.h"
-
-const std::string target_data = R"delimiter(<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>button {
-    border-radius: 8px; /* Adjust this value to control the roundness of corners */
-    background-color: aqua;
-    color: white;
-}</style>
-    <script>function showAlert() {
-    alert("You cliked me!");
-}</script>
-    <title>Document</title>
-</head>
-<body>
-    <button onclick="showAlert()">Click Me!</button>
-</body>
-</html>
-)delimiter";
-
-int main() {
-    std::map<std::string, int> res_map = {
-        {"index.html", IDR_HTML_INDEX},
-        {"style.css", IDR_CSS_STYLE},
-        {"script.js", IDR_JS_SCRIPT},
-    };
-
-    hse::HTMLStaticEmbedder embedder;
-    embedder.load_html_from_res(IDR_HTML_INDEX);
-    embedder.embed_static_from_res(res_map);
-    auto html_data = embedder.get_html_data();
-
-    if (html_data != target_data) {
-        return 1;
-    }
-
-    return 0;
-}
+#endif

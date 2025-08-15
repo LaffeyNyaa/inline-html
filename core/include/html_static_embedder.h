@@ -25,12 +25,12 @@
 #ifndef HSE_HTML_STATIC_EMBEDDER_H
 #define HSE_HTML_STATIC_EMBEDDER_H
 
+#include <iostream>
 #include <map>
 #include <optional>
 #include <regex>
 #include <string>
 #include <vector>
-#include <iostream>
 
 #ifdef WIN32
 #include <Windows.h>
@@ -41,19 +41,24 @@ class HTMLStaticEmbedder {
    public:
     HTMLStaticEmbedder() noexcept = default;
 
+    // Load html data from file.
     void load_html_from_file(const std::string &path) noexcept;
 
 #ifdef WIN32
+    // Load html data according to the .rc file.
     void load_html_from_res(int id) noexcept;
 #endif  // WIN32
 
+    // Embed static files according to filenames in the html file.
     void embed_static_from_files() noexcept;
 
 #ifdef WIN32
+    // Embed static files according to filenames in the html file and a res map.
     void embed_static_from_res(
         const std::map<std::string, int> &res_map) noexcept;
 #endif  // WIN32
 
+    // Get html data const reference.
     const std::string &get_html_data() const noexcept {
         if (!html_data.has_value()) {
             std::cerr << "[Error] HTML data is not loaded" << '\n';
