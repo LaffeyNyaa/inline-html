@@ -25,10 +25,12 @@
 #ifndef HSE_HTML_STATIC_EMBEDDER_H
 #define HSE_HTML_STATIC_EMBEDDER_H
 
+#include <map>
 #include <optional>
 #include <regex>
 #include <string>
 #include <vector>
+#include <iostream>
 
 #ifdef WIN32
 #include <Windows.h>
@@ -48,14 +50,23 @@ class HTMLStaticEmbedder {
     void embed_static_from_files() noexcept;
 
 #ifdef WIN32
-    void embed_static_from_res() noexcept;
+    void embed_static_from_res(
+        const std::map<std::string, int> &res_map) noexcept;
 #endif  // WIN32
 
-    const std::string &get_html_data() const noexcept { return html_data; }
+    const std::string &get_html_data() const noexcept {
+        if (!html_data.has_value()) {
+            std::cerr << "[Error] HTML data is not loaded" << '\n';
+            std::exit(1);
+        }
+
+        return *html_data;
+    }
 
    private:
-    std::string path_prefix;
-    std::string html_data;
+    std::optional<std::string> path_prefix;
+    std::optional<std::string> html_data;
+    std::optional<std::map<std::string, int>> res_map;
 
     std::optional<std::string> load_file(const std::string &path) noexcept;
 
@@ -68,10 +79,15 @@ class HTMLStaticEmbedder {
     void remove_all_cr() noexcept;
     std::optional<std::vector<std::smatch>> read_matches(
         const std::string &pattern) noexcept;
-    void embed_static() noexcept;
 
-    void embed_css_files_with_matches(const std::vector<std::smatch> &matches) noexcept;
-    void embed_js_files_with_matches(const std::vector<std::smatch> &matches) noexcept;
+    void embed_css_files_with_matches(
+        const std::vector<std::smatch> &matches) noexcept;
+    void embed_js_files_with_matches(
+        const std::vector<std::smatch> &matches) noexcept;
+    void embed_css_res_with_matches(
+        const std::vector<std::smatch> &matches) noexcept;
+    void embed_js_res_with_matches(
+        const std::vector<std::smatch> &matches) noexcept;
 };
 }  // namespace hse
 

@@ -24,8 +24,6 @@
 
 #include <html_static_embedder.h>
 
-#include "resource.h"
-
 const std::string target_data = R"delimiter(<!DOCTYPE html>
 <html lang="en">
 <head>

@@ -5,3 +5,7 @@ if(WIN32)
 endif()
 
 add_subdirectory(embed_static_from_files)
+
+if(WIN32)
+  add_subdirectory(embed_static_from_res)
+endif()

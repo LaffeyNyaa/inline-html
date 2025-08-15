@@ -25,14 +25,13 @@
 #include "html_static_embedder.h"
 
 #include <fstream>
-#include <iostream>
 #include <vector>
 
 void hse::HTMLStaticEmbedder::load_html_from_file(
     const std::string &path) noexcept {
     auto result = load_file(path);
     if (!result.has_value()) {
-        std::cerr << "Error loading file " << path << '\n';
+        std::cerr << "[Error] Can't load file: " << path << '\n';
         return;
     }
 
@@ -46,7 +45,7 @@ void hse::HTMLStaticEmbedder::load_html_from_file(
 void hse::HTMLStaticEmbedder::load_html_from_res(int id) noexcept {
     auto result = load_res(id, RT_HTML);
     if (!result.has_value()) {
-        std::cerr << "Error loading resource " << id << '\n';
+        std::cerr << "[Error] Can't load res: " << id << '\n';
         return;
     }
 
@@ -76,7 +75,28 @@ void hse::HTMLStaticEmbedder::embed_static_from_files() noexcept {
 }
 
 #ifdef WIN32
-void hse::HTMLStaticEmbedder::embed_static_from_res() noexcept {}
+void hse::HTMLStaticEmbedder::embed_static_from_res(
+    const std::map<std::string, int> &res_map_) noexcept {
+    res_map = res_map_;
+
+    std::string css_pattern =
+        R"(<link[^>]*rel=["']stylesheet["'][^>]*href=["']([^"']*)["'][^>]*>)";
+    auto css_matches_result = read_matches(css_pattern);
+
+    if (css_matches_result.has_value()) {
+        embed_css_res_with_matches(*css_matches_result);
+    }
+
+    std::string js_pattern =
+        R"(<script[^>]*src=["']([^"']*)["'][^>]*></script>)";
+    auto js_matches_result = read_matches(js_pattern);
+
+    if (js_matches_result.has_value()) {
+        embed_js_res_with_matches(*js_matches_result);
+    }
+
+    remove_all_cr();
+}
 #endif  // WIN32
 std::optional<std::string> hse::HTMLStaticEmbedder::load_file(
     const std::string &path) noexcept {
@@ -122,7 +142,6 @@ void hse::HTMLStaticEmbedder::get_path_prefix(
     }
 
     if (pos == std::string::npos) {
-        path_prefix = "";
         return;
     }
 
@@ -130,15 +149,22 @@ void hse::HTMLStaticEmbedder::get_path_prefix(
 }
 
 void hse::HTMLStaticEmbedder::remove_all_cr() noexcept {
-    auto iter = std::remove(html_data.begin(), html_data.end(), '\r');
-    html_data.erase(iter, html_data.end());
+    if (!html_data.has_value()) {
+        std::cerr
+            << "[Error] Remove all cr failed. HTML data has not beed loaded"
+            << '\n';
+        return;
+    }
+
+    auto iter = std::remove(html_data->begin(), html_data->end(), '\r');
+    html_data->erase(iter, html_data->end());
 }
 
 std::optional<std::vector<std::smatch>> hse::HTMLStaticEmbedder::read_matches(
     const std::string &pattern) noexcept {
     std::vector<std::smatch> matches;
     std::regex regex(pattern, std::regex_constants::icase);
-    std::sregex_iterator begin(html_data.begin(), html_data.end(), regex);
+    std::sregex_iterator begin(html_data->begin(), html_data->end(), regex);
     std::sregex_iterator end;
 
     for (auto iter = begin; iter != end; ++iter) {
@@ -161,18 +187,23 @@ void hse::HTMLStaticEmbedder::embed_css_files_with_matches(
         auto pos = iter->position();
         auto filename = (*iter)[1].str();
         auto full = (*iter)[0].str();
-        auto path = path_prefix + filename;
+        if (!path_prefix.has_value()) {
+            std::cerr << "[Error] Can't embed CSS files. Path prefix is not set"
+                      << '\n';
+            return;
+        }
+        auto path = *path_prefix + filename;
         auto data_result = load_file(path);
 
         if (!data_result.has_value()) {
-            std::cerr << "Error loading file " << path << '\n';
+            std::cerr << "[Error] Can't load file: " << path << '\n';
             continue;
         }
 
         auto data = "<style>" + *data_result + "</style>";
 
         auto len = full.size();
-        html_data.replace(pos, len, data);
+        html_data->replace(pos, len, data);
     }
 }
 
@@ -185,17 +216,70 @@ void hse::HTMLStaticEmbedder::embed_js_files_with_matches(
         auto pos = iter->position();
         auto filename = (*iter)[1].str();
         auto full = (*iter)[0].str();
-        auto path = path_prefix + filename;
+        if (!path_prefix.has_value()) {
+            std::cerr << "[Error] Can't embed JS files. Path prefix is not set"
+                      << '\n';
+            return;
+        }
+        auto path = *path_prefix + filename;
         auto data_result = load_file(path);
 
         if (!data_result.has_value()) {
-            std::cerr << "Error loading file " << path << '\n';
+            std::cerr << "[Error] Can't load file: " << path << '\n';
             continue;
         }
 
         auto data = "<script>" + *data_result + "</script>";
 
         auto len = full.size();
-        html_data.replace(pos, len, data);
+        html_data->replace(pos, len, data);
+    }
+}
+
+void hse::HTMLStaticEmbedder::embed_css_res_with_matches(
+    const std::vector<std::smatch> &matches) noexcept {
+    auto rbegin = matches.rbegin();
+    auto rend = matches.rend();
+
+    for (auto iter = rbegin; iter != rend; ++iter) {
+        auto pos = iter->position();
+        auto filename = (*iter)[1].str();
+        auto full = (*iter)[0].str();
+        auto res_id = (*res_map)[filename];
+        auto data_result = load_res(res_id, RT_RCDATA);
+
+        if (!data_result.has_value()) {
+            std::cerr << "[Error] Can't load file: " << filename << '\n';
+            continue;
+        }
+
+        auto data = "<style>" + *data_result + "</style>";
+
+        auto len = full.size();
+        html_data->replace(pos, len, data);
+    }
+}
+
+void hse::HTMLStaticEmbedder::embed_js_res_with_matches(
+    const std::vector<std::smatch> &matches) noexcept {
+    auto rbegin = matches.rbegin();
+    auto rend = matches.rend();
+
+    for (auto iter = rbegin; iter != rend; ++iter) {
+        auto pos = iter->position();
+        auto filename = (*iter)[1].str();
+        auto full = (*iter)[0].str();
+        auto res_id = (*res_map)[filename];
+        auto data_result = load_res(res_id, RT_RCDATA);
+
+        if (!data_result.has_value()) {
+            std::cerr << "[Error] Can't load file: " << filename << '\n';
+            continue;
+        }
+
+        auto data = "<script>" + *data_result + "</script>";
+
+        auto len = full.size();
+        html_data->replace(pos, len, data);
     }
 }

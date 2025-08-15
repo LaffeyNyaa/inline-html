@@ -1,4 +1,4 @@
-set(SRCS src/embed_static_from_files.cpp src/resource.rc)
+set(SRCS src/embed_static_from_files.cpp)
 add_test_target(embed_static_from_files "${SRCS}")
 target_include_directories(embed_static_from_files PRIVATE include)
 

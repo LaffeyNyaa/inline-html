@@ -26,8 +26,6 @@
 
 #include <iostream>
 
-#include "resource.h"
-
 const std::string target_data = R"delimiter(<!DOCTYPE html>
 <html lang="en">
 <head>
