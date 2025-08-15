@@ -1,4 +1,4 @@
-# Using html-static-embedder
+# Usage
 ```
 include(FetchContent)
 FetchContent_Declare(
