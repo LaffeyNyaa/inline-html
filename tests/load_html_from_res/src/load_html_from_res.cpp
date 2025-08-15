@@ -16,6 +16,7 @@ const std::string target_data = R"html(<!DOCTYPE html>
 </body>
 </html>
 )html";
+
 int main() {
     hse::HTMLStaticEmbedder embedder;
     embedder.load_html_from_res(IDR_HTML_INDEX);
