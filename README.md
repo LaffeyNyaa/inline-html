@@ -1,5 +1,6 @@
 # Using html-static-embedder
-```include(FetchContent)
+```
+include(FetchContent)
 FetchContent_Declare(
   html-static-embedder
   GIT_REPOSITORY https://github.com/LaffeyNyaa/html-static-embedder.git
@@ -9,16 +10,19 @@ FetchContent_MakeAvailable(html-static-embedder)
 
 # Examples
 ## Load from files
-`#include <html_static_embedder.h>
+```
+#include <html_static_embedder.h>
 
 int main() {
     hse::HTMLStaticEmbedder embedder;
     embedder.load_html_from_file("res/index.html");
     embedder.embed_static_from_files();
     auto html_data = embedder.get_html_data();
-}`
+}
+```
 ## Load according to the .rc file
-`#include <html_static_embedder.h>
+```
+#include <html_static_embedder.h>
 #include <map>
 #include "resource.h"
 
@@ -33,4 +37,5 @@ int main() {
     embedder.load_html_from_res(IDR_HTML_INDEX);
     embedder.embed_static_from_res(res_map);
     auto html_data = embedder.get_html_data();
-}`
+}
+```
