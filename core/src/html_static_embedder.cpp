@@ -19,7 +19,6 @@ void hse::HTMLStaticEmbedder::load_html_from_file(std::string_view path) {
 #ifdef WIN32
 void hse::HTMLStaticEmbedder::load_html_from_res(int id) {
     auto result = load_res(id, RT_HTML);
-
     if (!result.has_value()) {
         std::cerr << "Error loading resource " << id << '\n';
         return;
@@ -32,15 +31,15 @@ void hse::HTMLStaticEmbedder::load_html_from_res(int id) {
 
 std::optional<std::string> hse::HTMLStaticEmbedder::load_file(
     std::string_view path) {
-    const char *path_data = path.data();
+    auto path_data = path.data();
     std::ifstream file(path_data);
 
     if (!file.is_open()) {
         return std::nullopt;
     }
 
-    std::string data = std::string(std::istreambuf_iterator<char>(file),
-                                   std::istreambuf_iterator<char>());
+    auto data = std::string(std::istreambuf_iterator<char>(file),
+                            std::istreambuf_iterator<char>());
 
     return data;
 }
@@ -59,12 +58,11 @@ std::optional<std::string> hse::HTMLStaticEmbedder::load_res(int id,
         return std::nullopt;
     }
 
-    const char *res_data_p = static_cast<const char *>(data);
-    std::string res_data = std::string(res_data_p, size);
+    auto res_data_p = static_cast<const char *>(data);
+    auto res_data = std::string(res_data_p, size);
 
     return res_data;
 }
-
 #endif  // WIN32
 
 void hse::HTMLStaticEmbedder::remove_all_cr() {
