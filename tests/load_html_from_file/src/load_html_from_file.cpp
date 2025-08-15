@@ -26,7 +26,7 @@
 
 #include "resource.h"
 
-const std::string target_data = R"html(<!DOCTYPE html>
+const std::string target_data = R"delimiter(<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -39,12 +39,12 @@ const std::string target_data = R"html(<!DOCTYPE html>
     <button onclick="showAlert()">Click Me!</button>
 </body>
 </html>
-)html";
+)delimiter";
 
 int main() {
     hse::HTMLStaticEmbedder embedder;
     embedder.load_html_from_file("res/index.html");
-    std::string raw_html_data = embedder.get_raw_html_data();
+    std::string raw_html_data = embedder.get_html_data();
 
     if (raw_html_data != target_data) {
         return 1;

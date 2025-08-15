@@ -35,7 +35,7 @@ void hse::HTMLStaticEmbedder::load_html_from_file(std::string_view path) noexcep
         return;
     }
 
-    raw_html_data = std::move(*result);
+    html_data = std::move(*result);
 
     remove_all_cr();
 }
@@ -48,7 +48,7 @@ void hse::HTMLStaticEmbedder::load_html_from_res(int id) noexcept {
         return;
     }
 
-    raw_html_data = std::move(*result);
+    html_data = std::move(*result);
     remove_all_cr();
 }
 #endif  // WIN32
@@ -90,6 +90,10 @@ std::optional<std::string> hse::HTMLStaticEmbedder::load_res(int id,
 #endif  // WIN32
 
 void hse::HTMLStaticEmbedder::remove_all_cr() noexcept {
-    auto iter = std::remove(raw_html_data.begin(), raw_html_data.end(), '\r');
-    raw_html_data.erase(iter, raw_html_data.end());
+    auto iter = std::remove(html_data.begin(), html_data.end(), '\r');
+    html_data.erase(iter, html_data.end());
+}
+
+void hse::HTMLStaticEmbedder::embed_static() noexcept {
+
 }

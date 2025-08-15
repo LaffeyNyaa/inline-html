@@ -43,17 +43,12 @@ class HTMLStaticEmbedder {
     void load_html_from_res(int id) noexcept;
 #endif  // WIN32
 
-    const std::string &get_raw_html_data() const noexcept {
-        return raw_html_data;
-    }
-
-    const std::string &get_processed_html_data() const noexcept {
-        return processed_html_data;
+    const std::string &get_html_data() const noexcept {
+        return html_data;
     }
 
    private:
-    std::string raw_html_data;
-    std::string processed_html_data;
+    std::string html_data;
 
     std::optional<std::string> load_file(std::string_view path) noexcept;
 
@@ -62,6 +57,8 @@ class HTMLStaticEmbedder {
 #endif  // WIN32
 
     void remove_all_cr() noexcept;
+
+    void embed_static() noexcept;
 };
 }  // namespace hse
 
