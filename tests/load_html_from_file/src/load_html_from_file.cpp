@@ -2,7 +2,7 @@
 
 #include "resource.h"
 
-std::string target_data = R"html(<!DOCTYPE html>
+const std::string target_data = R"html(<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
