@@ -4,7 +4,8 @@ FetchContent_Declare(
   html-static-embedder
   GIT_REPOSITORY https://github.com/LaffeyNyaa/html-static-embedder.git
   GIT_TAG main)
-FetchContent_MakeAvailable(html-static-embedder)```
+FetchContent_MakeAvailable(html-static-embedder)
+```
 
 # Examples
 ## Load from files
