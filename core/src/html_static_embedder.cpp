@@ -64,7 +64,8 @@ void hse::HTMLStaticEmbedder::embed_static_from_files() noexcept {
         embed_css_files_with_matches(*css_matches_result);
     }
 
-    std::string js_pattern = R"(<script[^>]*src=["']([^"']*)["'][^>]*></script>)";
+    std::string js_pattern =
+        R"(<script[^>]*src=["']([^"']*)["'][^>]*></script>)";
     auto js_matches_result = read_matches(js_pattern);
 
     if (js_matches_result.has_value()) {
@@ -85,8 +86,8 @@ std::optional<std::string> hse::HTMLStaticEmbedder::load_file(
         return std::nullopt;
     }
 
-    auto data = std::string(std::istreambuf_iterator<char>(file),
-                            std::istreambuf_iterator<char>());
+    std::string data((std::istreambuf_iterator<char>(file)),
+                     std::istreambuf_iterator<char>());
 
     return data;
 }
@@ -106,7 +107,7 @@ std::optional<std::string> hse::HTMLStaticEmbedder::load_res(
     }
 
     auto res_data_p = static_cast<const char *>(data);
-    auto res_data = std::string(res_data_p, size);
+    std::string res_data(res_data_p, size);
 
     return res_data;
 }
