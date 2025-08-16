@@ -26,7 +26,7 @@
 #include <iostream>
 
 int main() {
-    hse::HTMLStaticEmbedder embedder;
+    hse::html_static_embedder embedder;
     embedder.load_html_from_file("res/index.html");
     embedder.embed_static_from_files();
     auto html_data = embedder.get_html_data();

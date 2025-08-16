@@ -27,7 +27,7 @@
 #include <fstream>
 #include <vector>
 
-void hse::HTMLStaticEmbedder::load_html_from_file(
+void hse::html_static_embedder::load_html_from_file(
     const std::string &path) noexcept {
     auto result = load_file(path);
     if (!result.has_value()) {
@@ -42,7 +42,7 @@ void hse::HTMLStaticEmbedder::load_html_from_file(
 }
 
 #ifdef WIN32
-void hse::HTMLStaticEmbedder::load_html_from_res(int id) noexcept {
+void hse::html_static_embedder::load_html_from_res(int id) noexcept {
     auto result = load_res(id, RT_HTML);
     if (!result.has_value()) {
         std::cerr << "[Error] Can't load res: " << id << '\n';
@@ -54,7 +54,7 @@ void hse::HTMLStaticEmbedder::load_html_from_res(int id) noexcept {
 }
 #endif  // WIN32
 
-void hse::HTMLStaticEmbedder::embed_static_from_files() noexcept {
+void hse::html_static_embedder::embed_static_from_files() noexcept {
     std::string css_pattern =
         R"(<link[^>]*rel=["']stylesheet["'][^>]*href=["']([^"']*)["'][^>]*>)";
     auto css_matches_result = read_matches(css_pattern);
@@ -75,7 +75,7 @@ void hse::HTMLStaticEmbedder::embed_static_from_files() noexcept {
 }
 
 #ifdef WIN32
-void hse::HTMLStaticEmbedder::embed_static_from_res(
+void hse::html_static_embedder::embed_static_from_res(
     const std::map<std::string, int> &res_map_) noexcept {
     res_map = res_map_;
 
@@ -98,7 +98,7 @@ void hse::HTMLStaticEmbedder::embed_static_from_res(
     remove_all_cr();
 }
 #endif  // WIN32
-std::optional<std::string> hse::HTMLStaticEmbedder::load_file(
+std::optional<std::string> hse::html_static_embedder::load_file(
     const std::string &path) noexcept {
     std::ifstream file(path);
 
@@ -113,7 +113,7 @@ std::optional<std::string> hse::HTMLStaticEmbedder::load_file(
 }
 
 #ifdef WIN32
-std::optional<std::string> hse::HTMLStaticEmbedder::load_res(
+std::optional<std::string> hse::html_static_embedder::load_res(
     int id, LPCSTR type) noexcept {
     HMODULE module = GetModuleHandle(nullptr);
     LPSTR int_res = MAKEINTRESOURCE(id);
@@ -133,7 +133,7 @@ std::optional<std::string> hse::HTMLStaticEmbedder::load_res(
 }
 #endif  // WIN32
 
-void hse::HTMLStaticEmbedder::get_path_prefix(
+void hse::html_static_embedder::get_path_prefix(
     const std::string &path) noexcept {
     auto pos = path.find_last_of('/');
 
@@ -148,7 +148,7 @@ void hse::HTMLStaticEmbedder::get_path_prefix(
     path_prefix = path.substr(0, pos + 1);
 }
 
-void hse::HTMLStaticEmbedder::remove_all_cr() noexcept {
+void hse::html_static_embedder::remove_all_cr() noexcept {
     if (!html_data.has_value()) {
         std::cerr
             << "[Error] Remove all cr failed. HTML data has not beed loaded"
@@ -160,7 +160,7 @@ void hse::HTMLStaticEmbedder::remove_all_cr() noexcept {
     html_data->erase(iter, html_data->end());
 }
 
-std::optional<std::vector<std::smatch>> hse::HTMLStaticEmbedder::read_matches(
+std::optional<std::vector<std::smatch>> hse::html_static_embedder::read_matches(
     const std::string &pattern) noexcept {
     std::vector<std::smatch> matches;
     std::regex regex(pattern, std::regex_constants::icase);
@@ -178,7 +178,7 @@ std::optional<std::vector<std::smatch>> hse::HTMLStaticEmbedder::read_matches(
     return std::move(matches);
 }
 
-void hse::HTMLStaticEmbedder::embed_css_files_with_matches(
+void hse::html_static_embedder::embed_css_files_with_matches(
     const std::vector<std::smatch> &matches) noexcept {
     auto rbegin = matches.rbegin();
     auto rend = matches.rend();
@@ -207,7 +207,7 @@ void hse::HTMLStaticEmbedder::embed_css_files_with_matches(
     }
 }
 
-void hse::HTMLStaticEmbedder::embed_js_files_with_matches(
+void hse::html_static_embedder::embed_js_files_with_matches(
     const std::vector<std::smatch> &matches) noexcept {
     auto rbegin = matches.rbegin();
     auto rend = matches.rend();
@@ -236,7 +236,7 @@ void hse::HTMLStaticEmbedder::embed_js_files_with_matches(
     }
 }
 
-void hse::HTMLStaticEmbedder::embed_css_res_with_matches(
+void hse::html_static_embedder::embed_css_res_with_matches(
     const std::vector<std::smatch> &matches) noexcept {
     auto rbegin = matches.rbegin();
     auto rend = matches.rend();
@@ -260,7 +260,7 @@ void hse::HTMLStaticEmbedder::embed_css_res_with_matches(
     }
 }
 
-void hse::HTMLStaticEmbedder::embed_js_res_with_matches(
+void hse::html_static_embedder::embed_js_res_with_matches(
     const std::vector<std::smatch> &matches) noexcept {
     auto rbegin = matches.rbegin();
     auto rend = matches.rend();

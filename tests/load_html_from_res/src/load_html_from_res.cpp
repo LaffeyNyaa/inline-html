@@ -42,7 +42,7 @@ const std::string target_data = R"delimiter(<!DOCTYPE html>
 )delimiter";
 
 int main() {
-    hse::HTMLStaticEmbedder embedder;
+    hse::html_static_embedder embedder;
     embedder.load_html_from_res(IDR_HTML_INDEX);
     auto html_data = embedder.get_html_data();
 

@@ -56,7 +56,7 @@ int main() {
         {"script.js", IDR_JS_SCRIPT},
     };
 
-    hse::HTMLStaticEmbedder embedder;
+    hse::html_static_embedder embedder;
     embedder.load_html_from_res(IDR_HTML_INDEX);
     embedder.embed_static_from_res(res_map);
     auto html_data = embedder.get_html_data();

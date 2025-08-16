@@ -14,7 +14,7 @@ FetchContent_MakeAvailable(html-static-embedder)
 #include <html_static_embedder.h>
 
 int main() {
-    hse::HTMLStaticEmbedder embedder;
+    hse::html_static_embedder embedder;
     embedder.load_html_from_file("res/index.html");
     embedder.embed_static_from_files();
     auto html_data = embedder.get_html_data();
@@ -33,7 +33,7 @@ int main() {
         {"script.js", IDR_JS_SCRIPT},
     };
 
-    hse::HTMLStaticEmbedder embedder;
+    hse::html_static_embedder embedder;
     embedder.load_html_from_res(IDR_HTML_INDEX);
     embedder.embed_static_from_res(res_map);
     auto html_data = embedder.get_html_data();

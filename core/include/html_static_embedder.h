@@ -37,9 +37,9 @@
 #endif  // WIN32
 
 namespace hse {
-class HTMLStaticEmbedder {
+class html_static_embedder {
    public:
-    HTMLStaticEmbedder() noexcept = default;
+    html_static_embedder() noexcept = default;
 
     // Load html data from file.
     void load_html_from_file(const std::string &path) noexcept;
