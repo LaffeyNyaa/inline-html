@@ -27,14 +27,15 @@
 #include <fstream>
 #include <vector>
 
-void hse::html_static_embedder::load_html_from_file(const std::string &path) {
-    auto data = load_file(path);
+void hse::html_static_embedder::load_html_from_file(
+    const std::string &filename) {
+    auto data = load_file(filename);
     if (!data.has_value()) {
-        std::cerr << "[Error] Can't load file: " << path << '\n';
+        std::cerr << "[Error] Can't load file: " << filename << '\n';
         return;
     }
 
-    get_path_prefix(path);
+    filename_prefix(filename);
     html_data_ = std::move(*data);
 
     remove_all_cr();
@@ -132,18 +133,18 @@ std::optional<std::string> hse::html_static_embedder::load_res(int id,
 }
 #endif  // WIN32
 
-void hse::html_static_embedder::get_path_prefix(const std::string &path) {
-    auto pos = path.find_last_of('/');
+void hse::html_static_embedder::filename_prefix(const std::string &filename) {
+    auto pos = filename.find_last_of('/');
 
     if (pos == std::string::npos) {
-        pos = path.find_last_of('\\');
+        pos = filename.find_last_of('\\');
     }
 
     if (pos == std::string::npos) {
         return;
     }
 
-    path_prefix_ = path.substr(0, pos + 1);
+    filename_prefix_ = filename.substr(0, pos + 1);
 }
 
 void hse::html_static_embedder::remove_all_cr() {
@@ -185,12 +186,12 @@ void hse::html_static_embedder::embed_css_files_with_matches(
         auto pos = iter->position();
         auto filename = (*iter)[1].str();
         auto full = (*iter)[0].str();
-        if (!path_prefix_.has_value()) {
+        if (!filename_prefix_.has_value()) {
             std::cerr << "[Error] Can't embed CSS files. Path prefix is not set"
                       << '\n';
             return;
         }
-        auto path = *path_prefix_ + filename;
+        auto path = *filename_prefix_ + filename;
         auto data = load_file(path);
 
         if (!data.has_value()) {
@@ -214,12 +215,12 @@ void hse::html_static_embedder::embed_js_files_with_matches(
         auto pos = iter->position();
         auto filename = (*iter)[1].str();
         auto full = (*iter)[0].str();
-        if (!path_prefix_.has_value()) {
+        if (!filename_prefix_.has_value()) {
             std::cerr << "[Error] Can't embed JS files. Path prefix is not set"
                       << '\n';
             return;
         }
-        auto path = *path_prefix_ + filename;
+        auto path = *filename_prefix_ + filename;
         auto data = load_file(path);
 
         if (!data.has_value()) {

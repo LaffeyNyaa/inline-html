@@ -25,12 +25,13 @@
 #ifndef HSE_HTML_STATIC_EMBEDDER_H
 #define HSE_HTML_STATIC_EMBEDDER_H
 
+#include <iostream>
 #include <map>
 #include <optional>
 #include <regex>
 #include <string>
 #include <vector>
-#include <iostream>
+
 
 #ifdef WIN32
 #include <Windows.h>
@@ -42,7 +43,7 @@ class html_static_embedder {
     html_static_embedder() = default;
 
     // Load html data from file.
-    void load_html_from_file(const std::string &path);
+    void load_html_from_file(const std::string &filename);
 
 #ifdef WIN32
     // Load html data from the .rc file.
@@ -58,26 +59,26 @@ class html_static_embedder {
 #endif  // WIN32
 
     // Get html data with optional wrapper
-    const std::optional<std::string> &html_data() const { 
+    const std::optional<std::string> &html_data() const {
         if (!html_data_.has_value()) {
             std::cerr << "[Error] html_data is not initialized" << '\n';
         }
 
-        return html_data_; 
+        return html_data_;
     }
 
    private:
-    std::optional<std::string> path_prefix_;
+    std::optional<std::string> filename_prefix_;
     std::optional<std::string> html_data_;
     std::optional<std::map<std::string, int>> res_map_;
 
-    std::optional<std::string> load_file(const std::string &path);
+    std::optional<std::string> load_file(const std::string &filename);
 
 #ifdef WIN32
     std::optional<std::string> load_res(int id, LPCSTR type);
 #endif  // WIN32
 
-    void get_path_prefix(const std::string &path);
+    void filename_prefix(const std::string &filename);
 
     void remove_all_cr();
     std::optional<std::vector<std::smatch>> read_matches(
