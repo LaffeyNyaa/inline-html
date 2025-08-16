@@ -57,7 +57,7 @@ class html_static_embedder {
     void embed_static_from_res(const std::map<std::string, int> &res_map);
 #endif  // WIN32
 
-    // Get html data const reference.
+    // Get html data with optional wrapper
     const std::optional<std::string> &html_data() const {
         return html_data_;
     }
