@@ -30,6 +30,7 @@
 #include <regex>
 #include <string>
 #include <vector>
+#include <iostream>
 
 #ifdef WIN32
 #include <Windows.h>

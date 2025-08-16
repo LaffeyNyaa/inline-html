@@ -25,7 +25,6 @@
 #include "html_static_embedder.h"
 
 #include <fstream>
-#include <iostream>
 #include <vector>
 
 void hse::html_static_embedder::load_html_from_file(const std::string &path) {
