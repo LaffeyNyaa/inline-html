@@ -57,7 +57,13 @@ class html_static_embedder {
 #endif  // WIN32
 
     // Get html data with optional wrapper
-    const std::optional<std::string> &html_data() const { return html_data_; }
+    const std::optional<std::string> &html_data() const { 
+        if (!html_data_.has_value()) {
+            std::cerr << "[Error] html_data is not initialized" << '\n';
+        }
+
+        return html_data_; 
+    }
 
    private:
     std::optional<std::string> path_prefix_;
