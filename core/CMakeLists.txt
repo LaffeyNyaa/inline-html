@@ -1,14 +1,15 @@
 set(SRCS src/html_static_embedder.cpp)
+set(HSE html_static_embedder)
 
-add_library(html_static_embedder ${SRCS})
-set_target_properties(html_static_embedder PROPERTIES CXX_STANDARD 20)
-target_include_directories(html_static_embedder PRIVATE include)
+add_library(${HSE} ${SRCS})
+set_target_properties(${HSE} PROPERTIES CXX_STANDARD 20)
+target_include_directories(${HSE} PRIVATE include)
+target_compile_features(${HSE} PRIVATE cxx_std_20)
 
 if(MSVC)
-  target_compile_options(html_static_embedder PRIVATE /W4)
-
+  target_compile_options(${HSE} PRIVATE /W4)
 endif()
 
 if(WIN32)
-  target_compile_definitions(html_static_embedder PUBLIC WIN32)
+  target_compile_definitions(${HSE} PUBLIC WIN32)
 endif()

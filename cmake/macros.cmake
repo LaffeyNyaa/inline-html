@@ -4,7 +4,7 @@ macro(add_example_target NAME SRCS)
   target_include_directories(${NAME} PRIVATE ${HTML_STATIC_EMBEDDER_INCLUDE_DIR}
                                              include)
   target_link_libraries(${NAME} PRIVATE html_static_embedder)
-
+  target_compile_features(${NAME} PRIVATE cxx_std_20)
   if(MSVC)
     target_compile_options(${NAME} PRIVATE /W4)
   endif()
