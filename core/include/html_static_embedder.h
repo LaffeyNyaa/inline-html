@@ -58,19 +58,19 @@ class html_static_embedder {
 #endif  // WIN32
 
     // Get html data const reference.
-    const std::string &get_html_data() const {
-        if (!html_data.has_value()) {
+    const std::string &html_data() const {
+        if (!html_data_.has_value()) {
             std::cerr << "[Error] HTML data is not loaded" << '\n';
             std::exit(1);
         }
 
-        return *html_data;
+        return *html_data_;
     }
 
    private:
-    std::optional<std::string> path_prefix;
-    std::optional<std::string> html_data;
-    std::optional<std::map<std::string, int>> res_map;
+    std::optional<std::string> path_prefix_;
+    std::optional<std::string> html_data_;
+    std::optional<std::map<std::string, int>> res_map_;
 
     std::optional<std::string> load_file(const std::string &path);
 

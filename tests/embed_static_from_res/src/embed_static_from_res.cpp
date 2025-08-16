@@ -59,7 +59,7 @@ int main() {
     hse::html_static_embedder embedder;
     embedder.load_html_from_res(IDR_HTML_INDEX);
     embedder.embed_static_from_res(res_map);
-    auto html_data = embedder.get_html_data();
+    auto html_data = embedder.html_data();
 
     if (html_data != target_data) {
         return 1;

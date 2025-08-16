@@ -35,7 +35,7 @@ void hse::html_static_embedder::load_html_from_file(const std::string &path) {
     }
 
     get_path_prefix(path);
-    html_data = std::move(*result);
+    html_data_ = std::move(*result);
 
     remove_all_cr();
 }
@@ -48,7 +48,7 @@ void hse::html_static_embedder::load_html_from_res(int id) {
         return;
     }
 
-    html_data = std::move(*result);
+    html_data_ = std::move(*result);
     remove_all_cr();
 }
 #endif  // WIN32
@@ -75,8 +75,8 @@ void hse::html_static_embedder::embed_static_from_files() {
 
 #ifdef WIN32
 void hse::html_static_embedder::embed_static_from_res(
-    const std::map<std::string, int> &res_map_) {
-    res_map = res_map_;
+    const std::map<std::string, int> &res_map) {
+    res_map_ = res_map;
 
     std::string css_pattern =
         R"(<link[^>]*rel=["']stylesheet["'][^>]*href=["']([^"']*)["'][^>]*>)";
@@ -143,26 +143,26 @@ void hse::html_static_embedder::get_path_prefix(const std::string &path) {
         return;
     }
 
-    path_prefix = path.substr(0, pos + 1);
+    path_prefix_ = path.substr(0, pos + 1);
 }
 
 void hse::html_static_embedder::remove_all_cr() {
-    if (!html_data.has_value()) {
+    if (!html_data_.has_value()) {
         std::cerr
             << "[Error] Remove all cr failed. HTML data has not beed loaded"
             << '\n';
         return;
     }
 
-    auto iter = std::remove(html_data->begin(), html_data->end(), '\r');
-    html_data->erase(iter, html_data->end());
+    auto iter = std::remove(html_data_->begin(), html_data_->end(), '\r');
+    html_data_->erase(iter, html_data_->end());
 }
 
 std::optional<std::vector<std::smatch>> hse::html_static_embedder::read_matches(
     const std::string &pattern) {
     std::vector<std::smatch> matches;
     std::regex regex(pattern, std::regex_constants::icase);
-    std::sregex_iterator begin(html_data->begin(), html_data->end(), regex);
+    std::sregex_iterator begin(html_data_->begin(), html_data_->end(), regex);
     std::sregex_iterator end;
 
     for (auto iter = begin; iter != end; ++iter) {
@@ -185,12 +185,12 @@ void hse::html_static_embedder::embed_css_files_with_matches(
         auto pos = iter->position();
         auto filename = (*iter)[1].str();
         auto full = (*iter)[0].str();
-        if (!path_prefix.has_value()) {
+        if (!path_prefix_.has_value()) {
             std::cerr << "[Error] Can't embed CSS files. Path prefix is not set"
                       << '\n';
             return;
         }
-        auto path = *path_prefix + filename;
+        auto path = *path_prefix_ + filename;
         auto data_result = load_file(path);
 
         if (!data_result.has_value()) {
@@ -201,7 +201,7 @@ void hse::html_static_embedder::embed_css_files_with_matches(
         auto data = "<style>" + *data_result + "</style>";
 
         auto len = full.size();
-        html_data->replace(pos, len, data);
+        html_data_->replace(pos, len, data);
     }
 }
 
@@ -214,12 +214,12 @@ void hse::html_static_embedder::embed_js_files_with_matches(
         auto pos = iter->position();
         auto filename = (*iter)[1].str();
         auto full = (*iter)[0].str();
-        if (!path_prefix.has_value()) {
+        if (!path_prefix_.has_value()) {
             std::cerr << "[Error] Can't embed JS files. Path prefix is not set"
                       << '\n';
             return;
         }
-        auto path = *path_prefix + filename;
+        auto path = *path_prefix_ + filename;
         auto data_result = load_file(path);
 
         if (!data_result.has_value()) {
@@ -230,7 +230,7 @@ void hse::html_static_embedder::embed_js_files_with_matches(
         auto data = "<script>" + *data_result + "</script>";
 
         auto len = full.size();
-        html_data->replace(pos, len, data);
+        html_data_->replace(pos, len, data);
     }
 }
 
@@ -243,7 +243,7 @@ void hse::html_static_embedder::embed_css_res_with_matches(
         auto pos = iter->position();
         auto filename = (*iter)[1].str();
         auto full = (*iter)[0].str();
-        auto res_id = (*res_map)[filename];
+        auto res_id = (*res_map_)[filename];
         auto data_result = load_res(res_id, RT_RCDATA);
 
         if (!data_result.has_value()) {
@@ -254,7 +254,7 @@ void hse::html_static_embedder::embed_css_res_with_matches(
         auto data = "<style>" + *data_result + "</style>";
 
         auto len = full.size();
-        html_data->replace(pos, len, data);
+        html_data_->replace(pos, len, data);
     }
 }
 
@@ -267,7 +267,7 @@ void hse::html_static_embedder::embed_js_res_with_matches(
         auto pos = iter->position();
         auto filename = (*iter)[1].str();
         auto full = (*iter)[0].str();
-        auto res_id = (*res_map)[filename];
+        auto res_id = (*res_map_)[filename];
         auto data_result = load_res(res_id, RT_RCDATA);
 
         if (!data_result.has_value()) {
@@ -278,6 +278,6 @@ void hse::html_static_embedder::embed_js_res_with_matches(
         auto data = "<script>" + *data_result + "</script>";
 
         auto len = full.size();
-        html_data->replace(pos, len, data);
+        html_data_->replace(pos, len, data);
     }
 }
