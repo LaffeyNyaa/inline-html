@@ -12,26 +12,26 @@ FetchContent_MakeAvailable(html-static-embedder)
 ## Load from files
 ```
 #include <html_static_embedder.h>
+#include <iostream>
 
 int main() {
     hse::html_static_embedder embedder;
     embedder.load_html_from_file("res/index.html");
     embedder.embed_static_from_files();
 
-    auto html_data_result = embedder.html_data();
-
-    if (html_data_result.has_value()) {
-        auto html_data = *html_data_result;
-    }
+    auto html_data = embedder.html_data();
+    std::cout << *html_data << '\n';
 
     return 0;
 }
 ```
 ## Load from the .rc file
 ```
-#include <html_static_embedder.h>
-#include <map>
 #include "resource.h"
+#include <html_static_embedder.h>
+#include <iostream>
+#include <map>
+
 
 int main() {
     std::map<std::string, int> res_map = {
@@ -44,11 +44,8 @@ int main() {
     embedder.load_html_from_res(IDR_HTML_INDEX);
     embedder.embed_static_from_res(res_map);
 
-    auto html_data_result = embedder.html_data();
-
-    if (html_data_result.has_value()) {
-        auto html_data = *html_data_result;
-    }
+    auto html_data = embedder.html_data();
+    std::cout << *html_data << '\n';
 
     return 0;
 }
