@@ -20,7 +20,7 @@ int main() {
     auto html_data = embedder.get_html_data();
 }
 ```
-## Load according to the .rc file
+## Load from the .rc file
 ```
 #include <html_static_embedder.h>
 #include <map>

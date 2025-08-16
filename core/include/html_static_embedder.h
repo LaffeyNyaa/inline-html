@@ -45,15 +45,15 @@ class html_static_embedder {
     void load_html_from_file(const std::string &path);
 
 #ifdef WIN32
-    // Load html data according to the .rc file.
+    // Load html data from the .rc file.
     void load_html_from_res(int id);
 #endif  // WIN32
 
-    // Embed static files according to filenames in the html file.
+    // Embed static files by filenames in the html file.
     void embed_static_from_files();
 
 #ifdef WIN32
-    // Embed static files according to filenames in the html file and a res map.
+    // Embed static files by filenames in the html file and a res map.
     void embed_static_from_res(const std::map<std::string, int> &res_map);
 #endif  // WIN32
 
