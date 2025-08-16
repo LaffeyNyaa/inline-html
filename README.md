@@ -33,7 +33,6 @@ int main() {
 #include <iostream>
 #include <map>
 
-
 int main() {
     std::map<std::string, int> res_map = {
         {"index.html", IDR_HTML_INDEX},
