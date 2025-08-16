@@ -17,7 +17,14 @@ int main() {
     hse::html_static_embedder embedder;
     embedder.load_html_from_file("res/index.html");
     embedder.embed_static_from_files();
-    auto html_data = embedder.get_html_data();
+
+    auto html_data_result = embedder.html_data();
+
+    if (html_data_result.has_value()) {
+        auto html_data = *html_data_result;
+    }
+
+    return 0;
 }
 ```
 ## Load from the .rc file
@@ -36,6 +43,13 @@ int main() {
     hse::html_static_embedder embedder;
     embedder.load_html_from_res(IDR_HTML_INDEX);
     embedder.embed_static_from_res(res_map);
-    auto html_data = embedder.get_html_data();
+
+    auto html_data_result = embedder.html_data();
+
+    if (html_data_result.has_value()) {
+        auto html_data = *html_data_result;
+    }
+
+    return 0;
 }
 ```
