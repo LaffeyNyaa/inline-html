@@ -25,7 +25,6 @@
 #ifndef HSE_HTML_STATIC_EMBEDDER_H
 #define HSE_HTML_STATIC_EMBEDDER_H
 
-#include <iostream>
 #include <map>
 #include <optional>
 #include <regex>
@@ -58,9 +57,7 @@ class html_static_embedder {
 #endif  // WIN32
 
     // Get html data with optional wrapper
-    const std::optional<std::string> &html_data() const {
-        return html_data_;
-    }
+    const std::optional<std::string> &html_data() const { return html_data_; }
 
    private:
     std::optional<std::string> path_prefix_;
