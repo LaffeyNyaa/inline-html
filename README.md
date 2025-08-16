@@ -12,11 +12,11 @@ FetchContent_MakeAvailable(html-static-embedder)
 # Examples
 ## Load from files
 ```
-#include <html_static_embedder.h>
+#include <inline_htmlder.h>
 #include <iostream>
 
 int main() {
-    hse::html_static_embedder embedder;
+    hse::inline_htmlder embedder;
     embedder.load_html_from_file("res/index.html");
     embedder.embed_static_from_files();
 
@@ -29,7 +29,7 @@ int main() {
 ## Load from the .rc file
 ```
 #include "resource.h"
-#include <html_static_embedder.h>
+#include <inline_htmlder.h>
 #include <iostream>
 #include <map>
 
@@ -40,7 +40,7 @@ int main() {
         {"script.js", IDR_JS_SCRIPT},
     };
 
-    hse::html_static_embedder embedder;
+    hse::inline_htmlder embedder;
     embedder.load_html_from_res(IDR_HTML_INDEX);
     embedder.embed_static_from_res(res_map);
 

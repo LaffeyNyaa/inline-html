@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-#include <html_static_embed.h>
+#include <inline_html.h>
 
 const std::string target_data = R"delimiter(<!DOCTYPE html>
 <html lang="en">
@@ -46,7 +46,7 @@ const std::string target_data = R"delimiter(<!DOCTYPE html>
 )delimiter";
 
 int main() {
-    html_static_embed::html_static_embed embedder;
+    inline_html::inline_html embedder;
     embedder.load_html_from_file("res/index.html");
     embedder.embed_static_from_files();
     auto html_data = embedder.html_data();

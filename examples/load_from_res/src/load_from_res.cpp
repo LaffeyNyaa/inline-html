@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-#include <html_static_embed.h>
+#include <inline_html.h>
 
 #include <iostream>
 #include <map>
@@ -36,7 +36,7 @@ int main() {
         {"script.js", IDR_JS_SCRIPT},
     };
 
-    html_static_embed::html_static_embed embedder;
+    inline_html::inline_html embedder;
     embedder.load_html_from_res(IDR_HTML_INDEX);
     embedder.embed_static_from_res(res_map);
     auto html_data = embedder.html_data();

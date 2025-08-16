@@ -22,8 +22,8 @@
  * SOFTWARE.
  */
 
-#ifndef HSE_HTML_STATIC_EMBEDDER_H
-#define HSE_HTML_STATIC_EMBEDDER_H
+#ifndef INLINE_HTML_H
+#define INLINE_HTML_H
 
 #include <iostream>
 #include <map>
@@ -36,10 +36,11 @@
 #include <Windows.h>
 #endif  // WIN32
 
-namespace html_static_embed {
-class html_static_embed {
+namespace inline_html {
+
+class inline_html {
    public:
-    html_static_embed() = default;
+    inline_html() = default;
 
     // Load html data from file.
     void load_html_from_file(const std::string &filename);
@@ -88,6 +89,6 @@ class html_static_embed {
     void embed_css_res_with_matches(const std::vector<std::smatch> &matches);
     void embed_js_res_with_matches(const std::vector<std::smatch> &matches);
 };
-}  // namespace html_static_embed
+}  // namespace inline_html
 
-#endif  // HSE_HTML_STATIC_EMBEDDER_H
+#endif  // INLINE_HTML_H
