@@ -7,6 +7,7 @@ macro(add_example_target NAME SRCS)
   target_compile_features(${NAME} PRIVATE cxx_std_20)
   if(MSVC)
     target_compile_options(${NAME} PRIVATE /W4)
+    target_compile_definitions(${NAME} PRIVATE _HAS_EXCEPTIONS=0)
   endif()
 endmacro()
 

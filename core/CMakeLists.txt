@@ -8,6 +8,7 @@ target_compile_features(${HSE} PRIVATE cxx_std_20)
 
 if(MSVC)
   target_compile_options(${HSE} PRIVATE /W4)
+  target_compile_definitions(${HSE} PRIVATE _HAS_EXCEPTIONS=0)
 endif()
 
 if(WIN32)
