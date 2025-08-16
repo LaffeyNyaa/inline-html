@@ -1,6 +1,7 @@
 # Usage
 ```
 include(FetchContent)
+
 FetchContent_Declare(
   html-static-embedder
   GIT_REPOSITORY https://github.com/LaffeyNyaa/html-static-embedder.git
