@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 4.0)
-project(html-static-embedder)
+project(html-static-embed)
 
 enable_testing()
 

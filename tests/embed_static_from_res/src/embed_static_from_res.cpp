@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-#include <html_static_embedder.h>
+#include <html_static_embed.h>
 
 #include <map>
 
@@ -56,7 +56,7 @@ int main() {
         {"script.js", IDR_JS_SCRIPT},
     };
 
-    hse::html_static_embedder embedder;
+    html_static_embed::html_static_embed embedder;
     embedder.load_html_from_res(IDR_HTML_INDEX);
     embedder.embed_static_from_res(res_map);
     auto html_data = embedder.html_data();

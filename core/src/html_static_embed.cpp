@@ -22,12 +22,12 @@
  * SOFTWARE.
  */
 
-#include "html_static_embedder.h"
+#include "html_static_embed.h"
 
 #include <fstream>
 #include <vector>
 
-void hse::html_static_embedder::load_html_from_file(
+void html_static_embed::html_static_embed::load_html_from_file(
     const std::string &filename) {
     auto data = load_file(filename);
     if (!data.has_value()) {
@@ -42,7 +42,7 @@ void hse::html_static_embedder::load_html_from_file(
 }
 
 #ifdef WIN32
-void hse::html_static_embedder::load_html_from_res(int id) {
+void html_static_embed::html_static_embed::load_html_from_res(int id) {
     auto data = load_res(id, RT_HTML);
     if (!data.has_value()) {
         std::cerr << "[Error] Can't load res: " << id << '\n';
@@ -54,7 +54,7 @@ void hse::html_static_embedder::load_html_from_res(int id) {
 }
 #endif  // WIN32
 
-void hse::html_static_embedder::embed_static_from_files() {
+void html_static_embed::html_static_embed::embed_static_from_files() {
     std::string css_pattern =
         R"(<link[^>]*rel=["']stylesheet["'][^>]*href=["']([^"']*)["'][^>]*>)";
     auto css_matches = read_matches(css_pattern);
@@ -75,7 +75,7 @@ void hse::html_static_embedder::embed_static_from_files() {
 }
 
 #ifdef WIN32
-void hse::html_static_embedder::embed_static_from_res(
+void html_static_embed::html_static_embed::embed_static_from_res(
     const std::map<std::string, int> &res_map) {
     res_map_ = res_map;
 
@@ -98,7 +98,7 @@ void hse::html_static_embedder::embed_static_from_res(
     remove_all_cr();
 }
 #endif  // WIN32
-std::optional<std::string> hse::html_static_embedder::load_file(
+std::optional<std::string> html_static_embed::html_static_embed::load_file(
     const std::string &path) {
     std::ifstream file(path);
 
@@ -113,7 +113,7 @@ std::optional<std::string> hse::html_static_embedder::load_file(
 }
 
 #ifdef WIN32
-std::optional<std::string> hse::html_static_embedder::load_res(int id,
+std::optional<std::string> html_static_embed::html_static_embed::load_res(int id,
                                                                LPCSTR type) {
     HMODULE module = GetModuleHandle(nullptr);
     LPSTR int_res = MAKEINTRESOURCE(id);
@@ -133,7 +133,7 @@ std::optional<std::string> hse::html_static_embedder::load_res(int id,
 }
 #endif  // WIN32
 
-void hse::html_static_embedder::filename_prefix(const std::string &filename) {
+void html_static_embed::html_static_embed::filename_prefix(const std::string &filename) {
     auto pos = filename.find_last_of('/');
 
     if (pos == std::string::npos) {
@@ -147,7 +147,7 @@ void hse::html_static_embedder::filename_prefix(const std::string &filename) {
     filename_prefix_ = filename.substr(0, pos + 1);
 }
 
-void hse::html_static_embedder::remove_all_cr() {
+void html_static_embed::html_static_embed::remove_all_cr() {
     if (!html_data_.has_value()) {
         std::cerr
             << "[Error] Remove all cr failed. HTML data has not beed loaded"
@@ -159,7 +159,7 @@ void hse::html_static_embedder::remove_all_cr() {
     html_data_->erase(iter, html_data_->end());
 }
 
-std::optional<std::vector<std::smatch>> hse::html_static_embedder::read_matches(
+std::optional<std::vector<std::smatch>> html_static_embed::html_static_embed::read_matches(
     const std::string &pattern) {
     std::vector<std::smatch> matches;
     std::regex regex(pattern, std::regex_constants::icase);
@@ -177,7 +177,7 @@ std::optional<std::vector<std::smatch>> hse::html_static_embedder::read_matches(
     return std::move(matches);
 }
 
-void hse::html_static_embedder::embed_css_files_with_matches(
+void html_static_embed::html_static_embed::embed_css_files_with_matches(
     const std::vector<std::smatch> &matches) {
     auto rbegin = matches.rbegin();
     auto rend = matches.rend();
@@ -206,7 +206,7 @@ void hse::html_static_embedder::embed_css_files_with_matches(
     }
 }
 
-void hse::html_static_embedder::embed_js_files_with_matches(
+void html_static_embed::html_static_embed::embed_js_files_with_matches(
     const std::vector<std::smatch> &matches) {
     auto rbegin = matches.rbegin();
     auto rend = matches.rend();
@@ -235,7 +235,7 @@ void hse::html_static_embedder::embed_js_files_with_matches(
     }
 }
 
-void hse::html_static_embedder::embed_css_res_with_matches(
+void html_static_embed::html_static_embed::embed_css_res_with_matches(
     const std::vector<std::smatch> &matches) {
     auto rbegin = matches.rbegin();
     auto rend = matches.rend();
@@ -259,7 +259,7 @@ void hse::html_static_embedder::embed_css_res_with_matches(
     }
 }
 
-void hse::html_static_embedder::embed_js_res_with_matches(
+void html_static_embed::html_static_embed::embed_js_res_with_matches(
     const std::vector<std::smatch> &matches) {
     auto rbegin = matches.rbegin();
     auto rend = matches.rend();

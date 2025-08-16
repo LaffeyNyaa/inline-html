@@ -32,15 +32,14 @@
 #include <string>
 #include <vector>
 
-
 #ifdef WIN32
 #include <Windows.h>
 #endif  // WIN32
 
-namespace hse {
-class html_static_embedder {
+namespace html_static_embed {
+class html_static_embed {
    public:
-    html_static_embedder() = default;
+    html_static_embed() = default;
 
     // Load html data from file.
     void load_html_from_file(const std::string &filename);
@@ -89,6 +88,6 @@ class html_static_embedder {
     void embed_css_res_with_matches(const std::vector<std::smatch> &matches);
     void embed_js_res_with_matches(const std::vector<std::smatch> &matches);
 };
-}  // namespace hse
+}  // namespace html_static_embed
 
 #endif  // HSE_HTML_STATIC_EMBEDDER_H

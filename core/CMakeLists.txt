@@ -1,5 +1,5 @@
-set(SRCS src/html_static_embedder.cpp)
-set(TARGET html_static_embedder)
+set(SRCS src/html_static_embed.cpp)
+set(TARGET html_static_embed)
 
 add_library(${TARGET} ${SRCS})
 set_target_properties(${TARGET} PROPERTIES CXX_STANDARD 20)

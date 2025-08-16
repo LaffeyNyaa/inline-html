@@ -1,9 +1,9 @@
 macro(add_example_target NAME SRCS)
   add_executable(${NAME} ${SRCS})
   set_target_properties(${NAME} PROPERTIES CXX_STANDARD 20)
-  target_include_directories(${NAME} PRIVATE ${HTML_STATIC_EMBEDDER_INCLUDE_DIR}
+  target_include_directories(${NAME} PRIVATE ${HTML_STATIC_EMBED_INCLUDE_DIR}
                                              include)
-  target_link_libraries(${NAME} PRIVATE html_static_embedder)
+  target_link_libraries(${NAME} PRIVATE ${HTML_STATIC_EMBED_NAME})
   target_compile_features(${NAME} PRIVATE cxx_std_20)
   if(MSVC)
     target_compile_options(${NAME} PRIVATE /W4)
