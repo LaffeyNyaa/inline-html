@@ -29,8 +29,8 @@
 #include <regex>
 #include <vector>
 
+namespace inline_html {
 using smatch_vec = std::vector<std::smatch>;
-using inline_html::res_map;
 
 static std::string get_dir(const std::string &path) noexcept {
     auto pos = path.find_last_of('/');
@@ -204,7 +204,7 @@ static std::string remove_all_cr(std::string data) noexcept {
     return data;
 }
 
-std::string inline_html::inline_html(const std::string &path) {
+std::string inline_html(const std::string &path) {
     auto dir = get_dir(path);
     auto data = read_file(path);
 
@@ -223,7 +223,7 @@ std::string inline_html::inline_html(const std::string &path) {
 }
 
 #ifdef WIN32
-std::string inline_html::inline_html(std::int32_t id, const res_map &res_map) {
+std::string inline_html(std::int32_t id, const res_map &res_map) {
     auto data = read_res(id, RT_HTML);
 
     std::string style_pattern =
@@ -240,3 +240,4 @@ std::string inline_html::inline_html(std::int32_t id, const res_map &res_map) {
     return data;
 }
 #endif  // WIN32
+}  // namespace inline_html
