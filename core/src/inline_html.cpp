@@ -25,6 +25,7 @@
 #include "inline_html.h"
 
 #include <exception>
+#include <regex>
 #include <fstream>
 #include <vector>
 

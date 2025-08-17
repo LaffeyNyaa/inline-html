@@ -24,6 +24,8 @@
 
 #include <inline_html.h>
 
+#include <iostream>
+
 const std::string sample = R"delimiter(<!DOCTYPE html>
 <html lang="en">
 <head>

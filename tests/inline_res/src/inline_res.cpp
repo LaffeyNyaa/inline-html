@@ -24,6 +24,7 @@
 
 #include <inline_html.h>
 
+#include <iostream>
 #include <map>
 
 #include "resource.h"

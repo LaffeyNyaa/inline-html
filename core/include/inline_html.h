@@ -25,12 +25,8 @@
 #ifndef INLINE_HTML_H
 #define INLINE_HTML_H
 
-#include <iostream>
 #include <map>
-#include <optional>
-#include <regex>
 #include <string>
-#include <vector>
 
 #ifdef WIN32
 #include <Windows.h>
