@@ -25,8 +25,8 @@
 #include "inline_html.h"
 
 #include <exception>
-#include <regex>
 #include <fstream>
+#include <regex>
 #include <vector>
 
 using smatch_vec = std::vector<std::smatch>;
@@ -62,7 +62,7 @@ static std::string read_file(const std::string &path) {
     return data;
 }
 
-/*
+/**
  * @throws std::system_error If a Windows API error occurs while loading
  *         resources.
  */
@@ -85,7 +85,7 @@ static std::string read_res(std::int32_t id, LPCSTR type) {
 }
 
 static smatch_vec get_smatches(const std::string &data,
-                               const std::string &pattern) {
+                               const std::string &pattern) noexcept {
     std::vector<std::smatch> smatches;
     std::regex regex(pattern, std::regex_constants::icase);
     std::sregex_iterator begin(data.begin(), data.end(), regex);
@@ -98,6 +98,10 @@ static smatch_vec get_smatches(const std::string &data,
     return smatches;
 }
 
+/**
+ * @throws std::ios_base::failure If there's an error reading the HTML file or
+ *         any of the referenced CSS/JS files.
+ */
 static std::string inline_style_files(const smatch_vec &smatches,
                                       const std::string &dir,
                                       const std::string &data) {
@@ -118,6 +122,10 @@ static std::string inline_style_files(const smatch_vec &smatches,
     return current_data;
 }
 
+/**
+ * @throws std::ios_base::failure If there's an error reading the HTML file or
+ *         any of the referenced CSS/JS files.
+ */
 static std::string inline_script_files(const smatch_vec &smatches,
                                        const std::string &dir,
                                        const std::string &data) {
@@ -141,6 +149,8 @@ static std::string inline_script_files(const smatch_vec &smatches,
 /**
  * @throws std::out_of_range If a referenced filename is not found in the
  *         provided resource map.
+ * @throws std::system_error If a Windows API error occurs while loading
+ *         resources.
  */
 static std::string inline_style_res(const smatch_vec &smatches,
                                     const std::string &data,
@@ -165,6 +175,8 @@ static std::string inline_style_res(const smatch_vec &smatches,
 /**
  * @throws std::out_of_range If a referenced filename is not found in the
  *         provided resource map.
+ * @throws std::system_error If a Windows API error occurs while loading
+ *         resources.
  */
 static std::string inline_script_res(const smatch_vec &smatches,
                                      const std::string &data,
@@ -186,7 +198,7 @@ static std::string inline_script_res(const smatch_vec &smatches,
     return current_data;
 }
 
-static std::string remove_all_cr(std::string data) {
+static std::string remove_all_cr(std::string data) noexcept {
     auto iter = std::remove(data.begin(), data.end(), '\r');
     data.erase(iter, data.end());
     return data;
