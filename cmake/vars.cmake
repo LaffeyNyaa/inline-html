@@ -1,3 +1,2 @@
-set(INLINE_HTML inline_html)
 set(INLINE_HTML_DIR ${CMAKE_SOURCE_DIR}/core)
 set(INLINE_HTML_INCLUDE_DIR ${INLINE_HTML_DIR}/include)

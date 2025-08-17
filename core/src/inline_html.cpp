@@ -24,261 +24,206 @@
 
 #include "inline_html.h"
 
+#include <exception>
 #include <fstream>
 #include <vector>
 
-void inline_html::inline_html::load_html_from_file(
-    const std::string &filename) {
-    auto data = load_file(filename);
-    if (!data.has_value()) {
-        std::cerr << "[Error] Can't load file: " << filename << '\n';
-        return;
+using smatch_vec = std::vector<std::smatch>;
+using inline_html::res_map;
+
+static std::string get_dir(const std::string &path) noexcept {
+    auto pos = path.find_last_of('/');
+
+    if (pos == std::string::npos) {
+        pos = path.find_last_of('\\');
     }
 
-    filename_prefix(filename);
-    html_data_ = std::move(*data);
+    if (pos == std::string::npos) {
+        return "";
+    }
 
-    remove_all_cr();
+    auto dir = path.substr(0, pos + 1);
+    return dir;
 }
 
-#ifdef WIN32
-void inline_html::inline_html::load_html_from_res(int id) {
-    auto data = load_res(id, RT_HTML);
-    if (!data.has_value()) {
-        std::cerr << "[Error] Can't load res: " << id << '\n';
-        return;
-    }
-
-    html_data_ = std::move(*data);
-    remove_all_cr();
-}
-#endif  // WIN32
-
-void inline_html::inline_html::embed_static_from_files() {
-    std::string css_pattern =
-        R"(<link[^>]*rel=["']stylesheet["'][^>]*href=["']([^"']*)["'][^>]*>)";
-    auto css_matches = read_matches(css_pattern);
-
-    if (css_matches.has_value()) {
-        embed_css_files_with_matches(*css_matches);
-    }
-
-    std::string js_pattern =
-        R"(<script[^>]*src=["']([^"']*)["'][^>]*></script>)";
-    auto js_matches = read_matches(js_pattern);
-
-    if (js_matches.has_value()) {
-        embed_js_files_with_matches(*js_matches);
-    }
-
-    remove_all_cr();
-}
-
-#ifdef WIN32
-void inline_html::inline_html::embed_static_from_res(
-    const std::map<std::string, int> &res_map) {
-    res_map_ = res_map;
-
-    std::string css_pattern =
-        R"(<link[^>]*rel=["']stylesheet["'][^>]*href=["']([^"']*)["'][^>]*>)";
-    auto css_matches = read_matches(css_pattern);
-
-    if (css_matches.has_value()) {
-        embed_css_res_with_matches(*css_matches);
-    }
-
-    std::string js_pattern =
-        R"(<script[^>]*src=["']([^"']*)["'][^>]*></script>)";
-    auto js_matches = read_matches(js_pattern);
-
-    if (js_matches.has_value()) {
-        embed_js_res_with_matches(*js_matches);
-    }
-
-    remove_all_cr();
-}
-#endif  // WIN32
-std::optional<std::string> inline_html::inline_html::load_file(
-    const std::string &path) {
+/**
+ * @throws std::ios_base::failure If there's an error reading the HTML file or
+ *         any of the referenced CSS/JS files.
+ */
+static std::string read_file(const std::string &path) {
     std::ifstream file(path);
+    file.exceptions(std::ios::failbit | std::ios::badbit);
 
-    if (!file.is_open()) {
-        return std::nullopt;
+    std::istreambuf_iterator<char> begin(file);
+    std::istreambuf_iterator<char> end;
+
+    std::string data(begin, end);
+    return data;
+}
+
+/*
+ * @throws std::system_error If a Windows API error occurs while loading
+ *         resources.
+ */
+static std::string read_res(std::int32_t id, LPCSTR type) {
+    auto module = GetModuleHandle(nullptr);
+    auto int_res = MAKEINTRESOURCE(id);
+    auto handle = FindResource(module, int_res, type);
+    auto loaded = LoadResource(module, handle);
+    auto locked_data = LockResource(loaded);
+    auto data = static_cast<LPSTR>(locked_data);
+
+    auto err = GetLastError();
+
+    if (err != ERROR_SUCCESS) {
+        std::error_code ec(err, std::system_category());
+        throw std::system_error(ec, "Windows API error");
     }
-
-    std::string data((std::istreambuf_iterator<char>(file)),
-                     std::istreambuf_iterator<char>());
 
     return data;
 }
 
-#ifdef WIN32
-std::optional<std::string> inline_html::inline_html::load_res(int id,
-                                                              LPCSTR type) {
-    HMODULE module = GetModuleHandle(nullptr);
-    LPSTR int_res = MAKEINTRESOURCE(id);
-    HRSRC handle = FindResource(module, int_res, type);
-    HGLOBAL loaded = LoadResource(module, handle);
-    LPVOID data = LockResource(loaded);
-    DWORD size = SizeofResource(module, handle);
-
-    if (GetLastError() != ERROR_SUCCESS) {
-        return std::nullopt;
-    }
-
-    auto res_data_p = static_cast<const char *>(data);
-    std::string res_data(res_data_p, size);
-
-    return res_data;
-}
-#endif  // WIN32
-
-void inline_html::inline_html::filename_prefix(const std::string &filename) {
-    auto pos = filename.find_last_of('/');
-
-    if (pos == std::string::npos) {
-        pos = filename.find_last_of('\\');
-    }
-
-    if (pos == std::string::npos) {
-        return;
-    }
-
-    filename_prefix_ = filename.substr(0, pos + 1);
-}
-
-void inline_html::inline_html::remove_all_cr() {
-    if (!html_data_.has_value()) {
-        std::cerr
-            << "[Error] Remove all cr failed. HTML data has not beed loaded"
-            << '\n';
-        return;
-    }
-
-    auto iter = std::remove(html_data_->begin(), html_data_->end(), '\r');
-    html_data_->erase(iter, html_data_->end());
-}
-
-std::optional<std::vector<std::smatch>> inline_html::inline_html::read_matches(
-    const std::string &pattern) {
-    std::vector<std::smatch> matches;
+static smatch_vec get_smatches(const std::string &data,
+                               const std::string &pattern) {
+    std::vector<std::smatch> smatches;
     std::regex regex(pattern, std::regex_constants::icase);
-    std::sregex_iterator begin(html_data_->begin(), html_data_->end(), regex);
+    std::sregex_iterator begin(data.begin(), data.end(), regex);
     std::sregex_iterator end;
 
     for (auto iter = begin; iter != end; ++iter) {
-        matches.emplace_back(*iter);
+        smatches.emplace_back(*iter);
     }
 
-    if (matches.empty()) {
-        return std::nullopt;
-    }
-
-    return std::move(matches);
+    return smatches;
 }
 
-void inline_html::inline_html::embed_css_files_with_matches(
-    const std::vector<std::smatch> &matches) {
-    auto rbegin = matches.rbegin();
-    auto rend = matches.rend();
+static std::string inline_style_files(const smatch_vec &smatches,
+                                      const std::string &dir,
+                                      const std::string &data) {
+    std::string current_data = data;
+    auto rbegin = smatches.rbegin();
+    auto rend = smatches.rend();
 
     for (auto iter = rbegin; iter != rend; ++iter) {
         auto pos = iter->position();
         auto filename = (*iter)[1].str();
-        auto full = (*iter)[0].str();
-        if (!filename_prefix_.has_value()) {
-            std::cerr << "[Error] Can't embed CSS files. Path prefix is not set"
-                      << '\n';
-            return;
-        }
-        auto path = *filename_prefix_ + filename;
-        auto data = load_file(path);
-
-        if (!data.has_value()) {
-            std::cerr << "[Error] Can't load file: " << path << '\n';
-            continue;
-        }
-
-        auto full_data = "<style>" + *data + "</style>";
-
-        auto len = full.size();
-        html_data_->replace(pos, len, full_data);
+        auto len = (*iter)[0].str().size();
+        auto path = dir + filename;
+        auto content = read_file(path);
+        content = "<style>" + content + "</style>";
+        current_data.replace(pos, len, content);
     }
+
+    return current_data;
 }
 
-void inline_html::inline_html::embed_js_files_with_matches(
-    const std::vector<std::smatch> &matches) {
-    auto rbegin = matches.rbegin();
-    auto rend = matches.rend();
+static std::string inline_script_files(const smatch_vec &smatches,
+                                       const std::string &dir,
+                                       const std::string &data) {
+    std::string current_data = data;
+    auto rbegin = smatches.rbegin();
+    auto rend = smatches.rend();
 
     for (auto iter = rbegin; iter != rend; ++iter) {
         auto pos = iter->position();
         auto filename = (*iter)[1].str();
-        auto full = (*iter)[0].str();
-        if (!filename_prefix_.has_value()) {
-            std::cerr << "[Error] Can't embed JS files. Path prefix is not set"
-                      << '\n';
-            return;
-        }
-        auto path = *filename_prefix_ + filename;
-        auto data = load_file(path);
-
-        if (!data.has_value()) {
-            std::cerr << "[Error] Can't load file: " << path << '\n';
-            continue;
-        }
-
-        auto full_data = "<script>" + *data + "</script>";
-
-        auto len = full.size();
-        html_data_->replace(pos, len, full_data);
+        auto len = (*iter)[0].str().size();
+        auto path = dir + filename;
+        auto content = read_file(path);
+        content = "<script>" + content + "</script>";
+        current_data.replace(pos, len, content);
     }
+
+    return current_data;
 }
 
-void inline_html::inline_html::embed_css_res_with_matches(
-    const std::vector<std::smatch> &matches) {
-    auto rbegin = matches.rbegin();
-    auto rend = matches.rend();
+/**
+ * @throws std::out_of_range If a referenced filename is not found in the
+ *         provided resource map.
+ */
+static std::string inline_style_res(const smatch_vec &smatches,
+                                    const std::string &data,
+                                    const res_map &res_map) {
+    std::string current_data = data;
+    auto rbegin = smatches.rbegin();
+    auto rend = smatches.rend();
 
     for (auto iter = rbegin; iter != rend; ++iter) {
         auto pos = iter->position();
         auto filename = (*iter)[1].str();
-        auto full = (*iter)[0].str();
-        auto res_id = (*res_map_)[filename];
-        auto data = load_res(res_id, RT_RCDATA);
-
-        if (!data.has_value()) {
-            std::cerr << "[Error] Can't load file: " << filename << '\n';
-            continue;
-        }
-
-        auto full_data = "<style>" + *data + "</style>";
-
-        auto len = full.size();
-        html_data_->replace(pos, len, full_data);
+        auto len = (*iter)[0].str().size();
+        auto res_id = res_map.at(filename);
+        auto content = read_res(res_id, RT_RCDATA);
+        content = "<style>" + content + "</style>";
+        current_data.replace(pos, len, content);
     }
+
+    return current_data;
 }
 
-void inline_html::inline_html::embed_js_res_with_matches(
-    const std::vector<std::smatch> &matches) {
-    auto rbegin = matches.rbegin();
-    auto rend = matches.rend();
+/**
+ * @throws std::out_of_range If a referenced filename is not found in the
+ *         provided resource map.
+ */
+static std::string inline_script_res(const smatch_vec &smatches,
+                                     const std::string &data,
+                                     const res_map &res_map) {
+    std::string current_data = data;
+    auto rbegin = smatches.rbegin();
+    auto rend = smatches.rend();
 
     for (auto iter = rbegin; iter != rend; ++iter) {
         auto pos = iter->position();
         auto filename = (*iter)[1].str();
-        auto full = (*iter)[0].str();
-        auto res_id = (*res_map_)[filename];
-        auto data = load_res(res_id, RT_RCDATA);
-
-        if (!data.has_value()) {
-            std::cerr << "[Error] Can't load file: " << filename << '\n';
-            continue;
-        }
-
-        auto full_data = "<script>" + *data + "</script>";
-
-        auto len = full.size();
-        html_data_->replace(pos, len, full_data);
+        auto len = (*iter)[0].str().size();
+        auto res_id = res_map.at(filename);
+        auto content = read_res(res_id, RT_RCDATA);
+        content = "<script>" + content + "</script>";
+        current_data.replace(pos, len, content);
     }
+
+    return current_data;
 }
+
+static std::string remove_all_cr(std::string data) {
+    auto iter = std::remove(data.begin(), data.end(), '\r');
+    data.erase(iter, data.end());
+    return data;
+}
+
+std::string inline_html::inline_html(const std::string &path) {
+    auto dir = get_dir(path);
+    auto data = read_file(path);
+
+    std::string style_pattern =
+        R"(<link[^>]*rel=["']stylesheet["'][^>]*href=["']([^"']*)["'][^>]*>)";
+    auto style_smatches = get_smatches(data, style_pattern);
+    data = inline_style_files(style_smatches, dir, data);
+
+    std::string script_pattern =
+        R"(<script[^>]*src=["']([^"']*)["'][^>]*></script>)";
+    auto script_smatches = get_smatches(data, script_pattern);
+    data = inline_script_files(script_smatches, dir, data);
+
+    data = remove_all_cr(data);
+    return data;
+}
+
+#ifdef WIN32
+std::string inline_html::inline_html(std::int32_t id, const res_map &res_map) {
+    auto data = read_res(id, RT_HTML);
+
+    std::string style_pattern =
+        R"(<link[^>]*rel=["']stylesheet["'][^>]*href=["']([^"']*)["'][^>]*>)";
+    auto style_smatches = get_smatches(data, style_pattern);
+    data = inline_style_res(style_smatches, data, res_map);
+
+    std::string script_pattern =
+        R"(<script[^>]*src=["']([^"']*)["'][^>]*></script>)";
+    auto script_smatches = get_smatches(data, script_pattern);
+    data = inline_script_res(script_smatches, data, res_map);
+
+    data = remove_all_cr(data);
+    return data;
+}
+#endif  // WIN32

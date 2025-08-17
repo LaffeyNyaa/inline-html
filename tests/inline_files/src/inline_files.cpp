@@ -22,11 +22,44 @@
  * SOFTWARE.
  */
 
-#ifndef RESOURCE_H
-#define RESOURCE_H
+#include <inline_html.h>
 
-#define IDR_HTML_INDEX 101
-#define IDR_CSS_STYLE 102
-#define IDR_JS_SCRIPT 103
+const std::string sample = R"delimiter(<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>button {
+    border-radius: 8px;
+    background-color: aqua;
+    color: white;
+}
+</style>
+    <script>function showAlert() {
+    alert("You cliked me!");
+}
+</script>
+    <title>Document</title>
+</head>
+<body>
+    <button onclick="showAlert()">Click Me!</button>
+</body>
+</html>
+)delimiter";
 
-#endif
+int main() {
+    std::string html;
+
+    try {
+        html = inline_html::inline_html("res/index.html");
+    } catch (const std::ios_base::failure &e) {
+        std::cerr << e.what() << '\n';
+        return 1;
+    }
+
+    if (html != sample) {
+        return 1;
+    }
+
+    return 0;
+}

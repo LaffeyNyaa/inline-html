@@ -38,57 +38,48 @@
 
 namespace inline_html {
 
-class inline_html {
-   public:
-    inline_html() = default;
+using res_map = std::map<std::string, std::int32_t>;
 
-    // Load html data from file.
-    void load_html_from_file(const std::string &filename);
-
-#ifdef WIN32
-    // Load html data from the .rc file.
-    void load_html_from_res(int id);
-#endif  // WIN32
-
-    // Embed static files by filenames in the html file.
-    void embed_static_from_files();
-
-#ifdef WIN32
-    // Embed static files by filenames in the html file and a res map.
-    void embed_static_from_res(const std::map<std::string, int> &res_map);
-#endif  // WIN32
-
-    // Get html data with optional wrapper
-    const std::optional<std::string> &html_data() const {
-        if (!html_data_.has_value()) {
-            std::cerr << "[Error] html_data is not initialized" << '\n';
-        }
-
-        return html_data_;
-    }
-
-   private:
-    std::optional<std::string> filename_prefix_;
-    std::optional<std::string> html_data_;
-    std::optional<std::map<std::string, int>> res_map_;
-
-    std::optional<std::string> load_file(const std::string &filename);
+/**
+ * @brief Inlines external CSS and JS files into an HTML document.
+ *
+ * This function reads an HTML file and replaces all `<link rel="stylesheet">`
+ * and `<script src="">` tags with the actual content of the referenced files,
+ * embedding them directly into the HTML document as `<style>` and `<script>`
+ * blocks respectively.
+ *
+ * @param path The file path to the HTML document to process.
+ *
+ * @return std::string The processed HTML document with CSS and JS inlined.
+ *
+ * @throws std::ios_base::failure If there's an error reading the HTML file or
+ *         any of the referenced CSS/JS files.
+ */
+std::string inline_html(const std::string &path);
 
 #ifdef WIN32
-    std::optional<std::string> load_res(int id, LPCSTR type);
+/**
+ * @brief Inlines CSS and JS resources into an HTML resource.
+ *
+ * This function loads an HTML resource from the Windows executable and replaces
+ * all `<link rel="stylesheet">` and `<script src="">` tags with the actual
+ * content of the referenced resources, embedding them directly into the HTML
+ * document as `<style>` and `<script>` blocks respectively.
+ *
+ * @param id The resource ID of the HTML document to process.
+ * @param res_map A mapping of resource filenames to their corresponding
+ *                resource IDs for CSS and JS files.
+ *
+ * @return std::string The processed HTML document with CSS and JS inlined.
+ *
+ * @throws std::system_error If a Windows API error occurs while loading
+ *         resources.
+ * @throws std::out_of_range If a referenced filename is not found in the
+ *         provided resource map.
+ */
+std::string inline_html(std::int32_t id, const res_map &res_map);
 #endif  // WIN32
 
-    void filename_prefix(const std::string &filename);
-
-    void remove_all_cr();
-    std::optional<std::vector<std::smatch>> read_matches(
-        const std::string &pattern);
-
-    void embed_css_files_with_matches(const std::vector<std::smatch> &matches);
-    void embed_js_files_with_matches(const std::vector<std::smatch> &matches);
-    void embed_css_res_with_matches(const std::vector<std::smatch> &matches);
-    void embed_js_res_with_matches(const std::vector<std::smatch> &matches);
-};
 }  // namespace inline_html
 
 #endif  // INLINE_HTML_H

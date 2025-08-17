@@ -3,7 +3,7 @@ macro(add_example_target NAME SRCS)
   set_target_properties(${NAME} PROPERTIES CXX_STANDARD 20)
   target_include_directories(${NAME} PRIVATE ${INLINE_HTML_INCLUDE_DIR}
                                              include)
-  target_link_libraries(${NAME} PRIVATE ${INLINE_HTML})
+  target_link_libraries(${NAME} PRIVATE inline_html)
   target_compile_features(${NAME} PRIVATE cxx_std_20)
   if(MSVC)
     target_compile_options(${NAME} PRIVATE /W4)

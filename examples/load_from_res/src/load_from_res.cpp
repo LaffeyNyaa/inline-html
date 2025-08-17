@@ -36,12 +36,19 @@ int main() {
         {"script.js", IDR_JS_SCRIPT},
     };
 
-    inline_html::inline_html embedder;
-    embedder.load_html_from_res(IDR_HTML_INDEX);
-    embedder.embed_static_from_res(res_map);
-    auto html_data = embedder.html_data();
+    std::string html;
 
-    std::cout << *html_data << '\n';
+    try {
+        html = inline_html::inline_html(IDR_HTML_INDEX, res_map);
+    } catch (const std::system_error &e) {
+        std::cerr << e.what() << '\n';
+        return 1;
+    } catch (const std::out_of_range &e) {
+        std::cerr << e.what() << '\n';
+        return 1;
+    }
+
+    std::cout << html << '\n';
 
     return 0;
 }

@@ -12,26 +12,33 @@ FetchContent_MakeAvailable(html-static-embedder)
 # Examples
 ## Load from files
 ```
-#include <inline_htmlder.h>
+#include <inline_html.h>
+
 #include <iostream>
 
 int main() {
-    hse::inline_htmlder embedder;
-    embedder.load_html_from_file("res/index.html");
-    embedder.embed_static_from_files();
+    std::string html;
 
-    auto html_data = embedder.html_data();
-    std::cout << *html_data << '\n';
+    try {
+        html = inline_html::inline_html("res/index.html");
+    } catch (std::ios_base::failure &e) {
+        std::cerr << e.what() << '\n';
+        return 1;
+    }
+
+    std::cout << html << '\n';
 
     return 0;
 }
 ```
 ## Load from the .rc file
 ```
-#include "resource.h"
-#include <inline_htmlder.h>
+#include <inline_html.h>
+
 #include <iostream>
 #include <map>
+
+#include "resource.h"
 
 int main() {
     std::map<std::string, int> res_map = {
@@ -40,12 +47,19 @@ int main() {
         {"script.js", IDR_JS_SCRIPT},
     };
 
-    hse::inline_htmlder embedder;
-    embedder.load_html_from_res(IDR_HTML_INDEX);
-    embedder.embed_static_from_res(res_map);
+    std::string html;
 
-    auto html_data = embedder.html_data();
-    std::cout << *html_data << '\n';
+    try {
+        html = inline_html::inline_html(IDR_HTML_INDEX, res_map);
+    } catch (const std::system_error &e) {
+        std::cerr << e.what() << '\n';
+        return 1;
+    } catch (const std::out_of_range &e) {
+        std::cerr << e.what() << '\n';
+        return 1;
+    }
+
+    std::cout << html << '\n';
 
     return 0;
 }

@@ -1,11 +1,5 @@
-add_subdirectory(load_html_from_file)
+add_subdirectory(inline_files)
 
 if(WIN32)
-  add_subdirectory(load_html_from_res)
-endif()
-
-add_subdirectory(embed_static_from_files)
-
-if(WIN32)
-  add_subdirectory(embed_static_from_res)
+  add_subdirectory(inline_res)
 endif()

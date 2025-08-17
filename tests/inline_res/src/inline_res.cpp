@@ -24,15 +24,25 @@
 
 #include <inline_html.h>
 
+#include <map>
+
 #include "resource.h"
 
-const std::string target_data = R"delimiter(<!DOCTYPE html>
+const std::string sample = R"delimiter(<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
-    <script src="script.js"></script>
+    <style>button {
+    border-radius: 8px; /* Adjust this value to control the roundness of corners */
+    background-color: aqua;
+    color: white;
+}
+</style>
+    <script>function showAlert() {
+    alert("You cliked me!");
+}
+</script>
     <title>Document</title>
 </head>
 <body>
@@ -42,11 +52,25 @@ const std::string target_data = R"delimiter(<!DOCTYPE html>
 )delimiter";
 
 int main() {
-    inline_html::inline_html embedder;
-    embedder.load_html_from_res(IDR_HTML_INDEX);
-    auto html_data = embedder.html_data();
+    std::map<std::string, int> res_map = {
+        {"index.html", IDR_HTML_INDEX},
+        {"style.css", IDR_CSS_STYLE},
+        {"script.js", IDR_JS_SCRIPT},
+    };
 
-    if (html_data != target_data) {
+    std::string html;
+
+    try {
+        html = inline_html::inline_html(IDR_HTML_INDEX, res_map);
+    } catch (const std::system_error &e) {
+        std::cerr << e.what() << '\n';
+        return 1;
+    } catch (const std::out_of_range &e) {
+        std::cerr << e.what() << '\n';
+        return 1;
+    }
+
+    if (html != sample) {
         return 1;
     }
 

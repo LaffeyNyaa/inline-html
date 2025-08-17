@@ -23,15 +23,20 @@
  */
 
 #include <inline_html.h>
+
 #include <iostream>
 
 int main() {
-    inline_html::inline_html embedder;
-    embedder.load_html_from_file("res/index.html");
-    embedder.embed_static_from_files();
-    auto html_data = embedder.html_data();
+    std::string html;
 
-    std::cout << *html_data << '\n';
+    try {
+        html = inline_html::inline_html("res/index.html");
+    } catch (std::ios_base::failure &e) {
+        std::cerr << e.what() << '\n';
+        return 1;
+    }
+
+    std::cout << html << '\n';
 
     return 0;
 }
