@@ -17,16 +17,16 @@ FetchContent_MakeAvailable(inline-html)
 #include <iostream>
 
 int main() {
-    std::string html;
+    std::string html_data;
 
     try {
-        html = inline_html::inline_html("res/index.html");
+        html_data = inline_html::inline_html("res/index.html");
     } catch (std::ios_base::failure &e) {
         std::cerr << e.what() << '\n';
         return 1;
     }
 
-    std::cout << html << '\n';
+    std::cout << html_data << '\n';
 
     return 0;
 }
@@ -41,16 +41,16 @@ int main() {
 #include "resource.h"
 
 int main() {
-    std::map<std::string, int> res_map = {
+    inline_html::resource_map resource_map = {
         {"index.html", IDR_HTML_INDEX},
         {"style.css", IDR_CSS_STYLE},
         {"script.js", IDR_JS_SCRIPT},
     };
 
-    std::string html;
+    std::string html_data;
 
     try {
-        html = inline_html::inline_html(IDR_HTML_INDEX, res_map);
+        html_data = inline_html::inline_html(IDR_HTML_INDEX, resource_map);
     } catch (const std::system_error &e) {
         std::cerr << e.what() << '\n';
         return 1;
