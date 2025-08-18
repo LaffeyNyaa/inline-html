@@ -40,17 +40,17 @@ int main() {
 
 #include "resource.h"
 
-int main() {
-    const inline_html::resource_map resource_map = {
-        {"index.html", IDR_HTML_INDEX},
-        {"style.css", IDR_CSS_STYLE},
-        {"script.js", IDR_JS_SCRIPT},
-    };
+static const inline_html::resource_map RESOURCE_MAP = {
+    {"index.html", IDR_HTML_INDEX},
+    {"style.css", IDR_CSS_STYLE},
+    {"script.js", IDR_JS_SCRIPT},
+};
 
+int main() {
     std::string html_data;
 
     try {
-        html_data = inline_html::inline_html(IDR_HTML_INDEX, resource_map);
+        html_data = inline_html::inline_html(IDR_HTML_INDEX, RESOURCE_MAP);
     } catch (const std::system_error &e) {
         std::cerr << e.what() << '\n';
         return 1;
