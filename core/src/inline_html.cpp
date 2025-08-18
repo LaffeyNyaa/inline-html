@@ -30,16 +30,16 @@
 #include <vector>
 
 namespace inline_html {
-using smatch_vec = std::vector<std::smatch>;
+using smatch_vector = std::vector<std::smatch>;
 
-static std::string get_dir(const std::string &path) noexcept {
-    auto pos = path.find_last_of("/\\");
+static std::string get_directory(const std::string &path) noexcept {
+    auto position = path.find_last_of("/\\");
 
-    if (pos == std::string::npos) {
+    if (position == std::string::npos) {
         return "";
     }
 
-    return path.substr(0, pos + 1);
+    return path.substr(0, position + 1);
 }
 
 /**
@@ -60,7 +60,7 @@ static std::string read_file(const std::string &path) {
  * @throws std::system_error If a Windows API error occurs while loading
  *         resources.
  */
-static std::string read_res(std::int32_t id, LPCSTR type) {
+static std::string read_resource(std::int32_t id, LPCSTR type) {
     auto module = GetModuleHandle(nullptr);
 
     if (module == nullptr) {
@@ -93,8 +93,8 @@ static std::string read_res(std::int32_t id, LPCSTR type) {
     return std::string(static_cast<LPSTR>(locked), size);
 }
 
-static smatch_vec get_smatches(const std::string &data,
-                               const std::string &pattern) noexcept {
+static smatch_vector get_regex_matches(const std::string &data,
+                                       const std::string &pattern) noexcept {
     std::regex regex(pattern, std::regex_constants::icase);
     std::sregex_iterator begin(data.begin(), data.end(), regex);
     std::sregex_iterator end;
@@ -106,21 +106,21 @@ static smatch_vec get_smatches(const std::string &data,
  * @throws std::ios_base::failure If there's an error reading the HTML file or
  *         any of the referenced CSS/JS files.
  */
-static std::string inline_style_files(const smatch_vec &smatches,
-                                      const std::string &dir,
+static std::string inline_style_files(const smatch_vector &smatches,
+                                      const std::string &directory,
                                       const std::string &data) {
     std::string current_data = data;
-    auto rbegin = smatches.rbegin();
-    auto rend = smatches.rend();
+    auto reverse_begin = smatches.rbegin();
+    auto reverse_end = smatches.rend();
 
-    for (auto iter = rbegin; iter != rend; ++iter) {
-        auto pos = iter->position();
-        auto filename = (*iter)[1].str();
-        auto len = (*iter)[0].str().size();
-        auto path = dir + filename;
+    for (auto iterator = reverse_begin; iterator != reverse_end; ++iterator) {
+        auto position = iterator->position();
+        auto filename = (*iterator)[1].str();
+        auto len = (*iterator)[0].str().size();
+        auto path = directory + filename;
         auto content = read_file(path);
         content = "<style>" + content + "</style>";
-        current_data.replace(pos, len, content);
+        current_data.replace(position, len, content);
     }
 
     return current_data;
@@ -130,21 +130,21 @@ static std::string inline_style_files(const smatch_vec &smatches,
  * @throws std::ios_base::failure If there's an error reading the HTML file or
  *         any of the referenced CSS/JS files.
  */
-static std::string inline_script_files(const smatch_vec &smatches,
-                                       const std::string &dir,
+static std::string inline_script_files(const smatch_vector &smatches,
+                                       const std::string &directory,
                                        const std::string &data) {
     std::string current_data = data;
-    auto rbegin = smatches.rbegin();
-    auto rend = smatches.rend();
+    auto reverse_begin = smatches.rbegin();
+    auto reverse_end = smatches.rend();
 
-    for (auto iter = rbegin; iter != rend; ++iter) {
-        auto pos = iter->position();
-        auto filename = (*iter)[1].str();
-        auto len = (*iter)[0].str().size();
-        auto path = dir + filename;
+    for (auto iterator = reverse_begin; iterator != reverse_end; ++iterator) {
+        auto position = iterator->position();
+        auto filename = (*iterator)[1].str();
+        auto len = (*iterator)[0].str().size();
+        auto path = directory + filename;
         auto content = read_file(path);
         content = "<script>" + content + "</script>";
-        current_data.replace(pos, len, content);
+        current_data.replace(position, len, content);
     }
 
     return current_data;
@@ -156,21 +156,21 @@ static std::string inline_script_files(const smatch_vec &smatches,
  * @throws std::system_error If a Windows API error occurs while loading
  *         resources.
  */
-static std::string inline_style_res(const smatch_vec &smatches,
+static std::string inline_style_res(const smatch_vector &smatches,
                                     const std::string &data,
-                                    const res_map &res_map) {
+                                    const resource_map &res_map) {
     std::string current_data = data;
-    auto rbegin = smatches.rbegin();
-    auto rend = smatches.rend();
+    auto reverse_begin = smatches.rbegin();
+    auto reverse_end = smatches.rend();
 
-    for (auto iter = rbegin; iter != rend; ++iter) {
-        auto pos = iter->position();
-        auto filename = (*iter)[1].str();
-        auto len = (*iter)[0].str().size();
+    for (auto iterator = reverse_begin; iterator != reverse_end; ++iterator) {
+        auto position = iterator->position();
+        auto filename = (*iterator)[1].str();
+        auto len = (*iterator)[0].str().size();
         auto res_id = res_map.at(filename);
-        auto content = read_res(res_id, RT_RCDATA);
+        auto content = read_resource(res_id, RT_RCDATA);
         content = "<style>" + content + "</style>";
-        current_data.replace(pos, len, content);
+        current_data.replace(position, len, content);
     }
 
     return current_data;
@@ -182,62 +182,62 @@ static std::string inline_style_res(const smatch_vec &smatches,
  * @throws std::system_error If a Windows API error occurs while loading
  *         resources.
  */
-static std::string inline_script_res(const smatch_vec &smatches,
+static std::string inline_script_res(const smatch_vector &smatches,
                                      const std::string &data,
-                                     const res_map &res_map) {
+                                     const resource_map &res_map) {
     std::string current_data = data;
-    auto rbegin = smatches.rbegin();
-    auto rend = smatches.rend();
+    auto reverse_begin = smatches.rbegin();
+    auto reverse_end = smatches.rend();
 
-    for (auto iter = rbegin; iter != rend; ++iter) {
-        auto pos = iter->position();
-        auto filename = (*iter)[1].str();
-        auto len = (*iter)[0].str().size();
+    for (auto iterator = reverse_begin; iterator != reverse_end; ++iterator) {
+        auto position = iterator->position();
+        auto filename = (*iterator)[1].str();
+        auto len = (*iterator)[0].str().size();
         auto res_id = res_map.at(filename);
-        auto content = read_res(res_id, RT_RCDATA);
+        auto content = read_resource(res_id, RT_RCDATA);
         content = "<script>" + content + "</script>";
-        current_data.replace(pos, len, content);
+        current_data.replace(position, len, content);
     }
 
     return current_data;
 }
 
 static std::string remove_all_cr(std::string data) noexcept {
-    auto iter = std::remove(data.begin(), data.end(), '\r');
-    data.erase(iter, data.end());
+    auto iterator = std::remove(data.begin(), data.end(), '\r');
+    data.erase(iterator, data.end());
     return data;
 }
 
 std::string inline_html(const std::string &path) {
-    auto dir = get_dir(path);
+    auto directory = get_directory(path);
     auto data = read_file(path);
 
     std::string style_pattern =
         R"(<link[^>]*rel=["']stylesheet["'][^>]*href=["']([^"']*)["'][^>]*>)";
-    auto style_smatches = get_smatches(data, style_pattern);
-    data = inline_style_files(style_smatches, dir, data);
+    auto style_smatches = get_regex_matches(data, style_pattern);
+    data = inline_style_files(style_smatches, directory, data);
 
     std::string script_pattern =
         R"(<script[^>]*src=["']([^"']*)["'][^>]*></script>)";
-    auto script_smatches = get_smatches(data, script_pattern);
-    data = inline_script_files(script_smatches, dir, data);
+    auto script_smatches = get_regex_matches(data, script_pattern);
+    data = inline_script_files(script_smatches, directory, data);
 
     data = remove_all_cr(data);
     return data;
 }
 
 #ifdef WIN32
-std::string inline_html(std::int32_t id, const res_map &res_map) {
-    auto data = read_res(id, RT_HTML);
+std::string inline_html(std::int32_t id, const resource_map &res_map) {
+    auto data = read_resource(id, RT_HTML);
 
     std::string style_pattern =
         R"(<link[^>]*rel=["']stylesheet["'][^>]*href=["']([^"']*)["'][^>]*>)";
-    auto style_smatches = get_smatches(data, style_pattern);
+    auto style_smatches = get_regex_matches(data, style_pattern);
     data = inline_style_res(style_smatches, data, res_map);
 
     std::string script_pattern =
         R"(<script[^>]*src=["']([^"']*)["'][^>]*></script>)";
-    auto script_smatches = get_smatches(data, script_pattern);
+    auto script_smatches = get_regex_matches(data, script_pattern);
     data = inline_script_res(script_smatches, data, res_map);
 
     data = remove_all_cr(data);

@@ -34,7 +34,7 @@
 
 namespace inline_html {
 
-using res_map = std::map<std::string, std::int32_t>;
+using resource_map = std::map<std::string, std::int32_t>;
 
 /**
  * @brief Inlines external CSS and JS files into an HTML document.
@@ -73,7 +73,7 @@ std::string inline_html(const std::string &path);
  * @throws std::out_of_range If a referenced filename is not found in the
  *         provided resource map.
  */
-std::string inline_html(std::int32_t id, const res_map &res_map);
+std::string inline_html(std::int32_t id, const resource_map &res_map);
 #endif  // WIN32
 
 }  // namespace inline_html
