@@ -41,7 +41,7 @@ int main() {
 #include "resource.h"
 
 int main() {
-    inline_html::resource_map resource_map = {
+    const inline_html::resource_map resource_map = {
         {"index.html", IDR_HTML_INDEX},
         {"style.css", IDR_CSS_STYLE},
         {"script.js", IDR_JS_SCRIPT},
