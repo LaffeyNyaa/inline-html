@@ -59,7 +59,7 @@ int main() {
         return 1;
     }
 
-    std::cout << html << '\n';
+    std::cout << html_data << '\n';
 
     return 0;
 }
