@@ -10,7 +10,7 @@ FetchContent_MakeAvailable(inline-html)
 ```
 
 # Examples
-## Load from files
+## Load from HTML file
 ```
 #include <inline_html.h>
 
@@ -31,7 +31,7 @@ int main() {
     return 0;
 }
 ```
-## Load from the .rc file
+## Load from .rc file
 ```
 #include <inline_html.h>
 
