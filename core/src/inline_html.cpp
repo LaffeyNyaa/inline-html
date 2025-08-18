@@ -113,9 +113,8 @@ static smatch_vector get_regex_matches(const std::string &data,
  */
 static std::string inline_static_files(const smatch_vector &smatches,
                                        const std::string &directory,
-                                       const std::string &data,
+                                       std::string data,
                                        const std::string &wrapper_tag) {
-    std::string current_data = data;
     auto reverse_begin = smatches.rbegin();
     auto reverse_end = smatches.rend();
 
@@ -126,10 +125,10 @@ static std::string inline_static_files(const smatch_vector &smatches,
         auto path = directory + filename;
         auto content = read_file(path);
         content = '<' + wrapper_tag + '>' + content + "</" + wrapper_tag + '>';
-        current_data.replace(position, len, content);
+        data.replace(position, len, content);
     }
 
-    return current_data;
+    return data;
 }
 
 /**
@@ -139,10 +138,9 @@ static std::string inline_static_files(const smatch_vector &smatches,
  *         resources.
  */
 static std::string inline_static_resources(const smatch_vector &smatches,
-                                           const std::string &data,
+                                           std::string data,
                                            const resource_map &res_map,
                                            const std::string &wrapper_tag) {
-    std::string current_data = data;
     auto reverse_begin = smatches.rbegin();
     auto reverse_end = smatches.rend();
 
@@ -153,10 +151,10 @@ static std::string inline_static_resources(const smatch_vector &smatches,
         auto res_id = res_map.at(filename);
         auto content = read_resource(res_id, RT_RCDATA);
         content = '<' + wrapper_tag + '>' + content + "</" + wrapper_tag + '>';
-        current_data.replace(position, len, content);
+        data.replace(position, len, content);
     }
 
-    return current_data;
+    return data;
 }
 
 static std::string remove_all_cr(std::string data) noexcept {
