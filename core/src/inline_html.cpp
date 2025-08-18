@@ -118,10 +118,10 @@ static std::string inline_static_files(const smatch_vector &smatches,
     auto reverse_begin = smatches.rbegin();
     auto reverse_end = smatches.rend();
 
-    for (auto iterator = reverse_begin; iterator != reverse_end; ++iterator) {
-        auto position = iterator->position();
-        auto filename = (*iterator)[1].str();
-        auto len = (*iterator)[0].str().size();
+    for (auto match = reverse_begin; match != reverse_end; ++match) {
+        auto position = match->position();
+        auto filename = (*match)[1].str();
+        auto len = (*match)[0].str().size();
         auto path = directory + filename;
         auto content = read_file(path);
         content = '<' + wrapper_tag + '>' + content + "</" + wrapper_tag + '>';
@@ -144,10 +144,10 @@ static std::string inline_static_resources(const smatch_vector &smatches,
     auto reverse_begin = smatches.rbegin();
     auto reverse_end = smatches.rend();
 
-    for (auto iterator = reverse_begin; iterator != reverse_end; ++iterator) {
-        auto position = iterator->position();
-        auto filename = (*iterator)[1].str();
-        auto len = (*iterator)[0].str().size();
+    for (auto match = reverse_begin; match != reverse_end; ++match) {
+        auto position = match->position();
+        auto filename = (*match)[1].str();
+        auto len = (*match)[0].str().size();
         auto res_id = res_map.at(filename);
         auto content = read_resource(res_id, RT_RCDATA);
         content = '<' + wrapper_tag + '>' + content + "</" + wrapper_tag + '>';
