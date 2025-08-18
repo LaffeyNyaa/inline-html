@@ -26,7 +26,7 @@
 
 #include <iostream>
 
-const std::string test_sample = R"delimiter(<!DOCTYPE html>
+static const std::string TEST_SAMPLE = R"delimiter(<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -59,7 +59,7 @@ int main() {
         return 1;
     }
 
-    if (html_data != test_sample) {
+    if (html_data != TEST_SAMPLE) {
         return 1;
     }
 
