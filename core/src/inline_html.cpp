@@ -55,6 +55,7 @@ static std::string get_directory(const std::string &path) noexcept {
 static std::string read_file(const std::string &path) {
     std::ifstream file(path);
     file.exceptions(std::ios::failbit | std::ios::badbit);
+
     return std::string(std::istreambuf_iterator<char>(file), {});
 }
 
@@ -163,28 +164,26 @@ std::string inline_html(const std::string &path) {
     auto directory = get_directory(path);
     auto data = read_file(path);
 
-    auto style_smatches = get_regex_matches(data, STYLE_PATTERN);
+    const auto style_smatches = get_regex_matches(data, STYLE_PATTERN);
     data = inline_static_files(style_smatches, directory, data, "style");
 
-    auto script_smatches = get_regex_matches(data, SCRIPT_PATTERN);
+    const auto script_smatches = get_regex_matches(data, SCRIPT_PATTERN);
     data = inline_static_files(script_smatches, directory, data, "script");
 
-    data = remove_all_cr(data);
-    return data;
+    return remove_all_cr(data);
 }
 
 #ifdef WIN32
 std::string inline_html(std::int32_t id, const resource_map &res_map) {
     auto data = read_resource(id, RT_HTML);
 
-    auto style_smatches = get_regex_matches(data, STYLE_PATTERN);
+    const auto style_smatches = get_regex_matches(data, STYLE_PATTERN);
     data = inline_static_resources(style_smatches, data, res_map, "style");
 
-    auto script_smatches = get_regex_matches(data, SCRIPT_PATTERN);
+    const auto script_smatches = get_regex_matches(data, SCRIPT_PATTERN);
     data = inline_static_resources(script_smatches, data, res_map, "script");
 
-    data = remove_all_cr(data);
-    return data;
+    return remove_all_cr(data);
 }
 #endif  // WIN32
 }  // namespace inline_html
