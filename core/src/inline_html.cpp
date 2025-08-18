@@ -33,20 +33,14 @@ namespace inline_html {
 using smatch_vec = std::vector<std::smatch>;
 
 static std::string get_dir(const std::string &path) noexcept {
-    auto pos = path.find_last_of('/');
-
-    if (pos == std::string::npos) {
-        pos = path.find_last_of('\\');
-    }
+    auto pos = path.find_last_of("/\\");
 
     if (pos == std::string::npos) {
         return "";
     }
 
-    auto dir = path.substr(0, pos + 1);
-    return dir;
+    return path.substr(0, pos + 1);
 }
-
 /**
  * @throws std::ios_base::failure If there's an error reading the HTML file or
  *         any of the referenced CSS/JS files.
