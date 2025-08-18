@@ -26,7 +26,7 @@
 
 #include <iostream>
 
-const std::string sample = R"delimiter(<!DOCTYPE html>
+const std::string test_sample = R"delimiter(<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -50,16 +50,16 @@ const std::string sample = R"delimiter(<!DOCTYPE html>
 )delimiter";
 
 int main() {
-    std::string html;
+    std::string html_data;
 
     try {
-        html = inline_html::inline_html("res/index.html");
+        html_data = inline_html::inline_html("res/index.html");
     } catch (const std::ios_base::failure &e) {
         std::cerr << e.what() << '\n';
         return 1;
     }
 
-    if (html != sample) {
+    if (html_data != test_sample) {
         return 1;
     }
 

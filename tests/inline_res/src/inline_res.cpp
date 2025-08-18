@@ -29,7 +29,7 @@
 
 #include "resource.h"
 
-const std::string sample = R"delimiter(<!DOCTYPE html>
+const std::string test_sample = R"delimiter(<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -53,16 +53,16 @@ const std::string sample = R"delimiter(<!DOCTYPE html>
 )delimiter";
 
 int main() {
-    std::map<std::string, int> res_map = {
+    inline_html::resource_map resource_map = {
         {"index.html", IDR_HTML_INDEX},
         {"style.css", IDR_CSS_STYLE},
         {"script.js", IDR_JS_SCRIPT},
     };
 
-    std::string html;
+    std::string html_data;
 
     try {
-        html = inline_html::inline_html(IDR_HTML_INDEX, res_map);
+        html_data = inline_html::inline_html(IDR_HTML_INDEX, resource_map);
     } catch (const std::system_error &e) {
         std::cerr << e.what() << '\n';
         return 1;
@@ -71,7 +71,7 @@ int main() {
         return 1;
     }
 
-    if (html != sample) {
+    if (html_data != test_sample) {
         return 1;
     }
 
