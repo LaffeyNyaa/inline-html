@@ -41,6 +41,7 @@ static std::string get_dir(const std::string &path) noexcept {
 
     return path.substr(0, pos + 1);
 }
+
 /**
  * @throws std::ios_base::failure If there's an error reading the HTML file or
  *         any of the referenced CSS/JS files.
@@ -52,8 +53,7 @@ static std::string read_file(const std::string &path) {
     std::istreambuf_iterator<char> begin(file);
     std::istreambuf_iterator<char> end;
 
-    std::string data(begin, end);
-    return data;
+    return std::string(begin, end);
 }
 
 /**
@@ -62,34 +62,44 @@ static std::string read_file(const std::string &path) {
  */
 static std::string read_res(std::int32_t id, LPCSTR type) {
     auto module = GetModuleHandle(nullptr);
-    auto int_res = MAKEINTRESOURCE(id);
-    auto handle = FindResource(module, int_res, type);
-    auto loaded = LoadResource(module, handle);
-    auto locked_data = LockResource(loaded);
-    auto data = static_cast<LPSTR>(locked_data);
 
-    auto err = GetLastError();
-
-    if (err != ERROR_SUCCESS) {
-        std::error_code ec(err, std::system_category());
-        throw std::system_error(ec, "Windows API error");
+    if (module == nullptr) {
+        std::error_code ec(GetLastError(), std::system_category());
+        throw std::system_error(ec, "GetModuleHandle failed");
     }
 
-    return data;
+    auto handle = FindResource(module, MAKEINTRESOURCE(id), type);
+
+    if (handle == nullptr) {
+        std::error_code ec(GetLastError(), std::system_category());
+        throw std::system_error(ec, "FindResource failed");
+    }
+
+    auto loaded = LoadResource(module, handle);
+
+    if (loaded == nullptr) {
+        std::error_code ec(GetLastError(), std::system_category());
+        throw std::system_error(ec, "LoadResource failed");
+    }
+
+    auto locked = LockResource(loaded);
+
+    if (locked == nullptr) {
+        std::error_code ec(GetLastError(), std::system_category());
+        throw std::system_error(ec, "LockResource failed");
+    }
+
+    auto size = SizeofResource(module, handle);
+    return std::string(static_cast<LPSTR>(locked), size);
 }
 
 static smatch_vec get_smatches(const std::string &data,
                                const std::string &pattern) noexcept {
-    std::vector<std::smatch> smatches;
     std::regex regex(pattern, std::regex_constants::icase);
     std::sregex_iterator begin(data.begin(), data.end(), regex);
     std::sregex_iterator end;
 
-    for (auto iter = begin; iter != end; ++iter) {
-        smatches.emplace_back(*iter);
-    }
-
-    return smatches;
+    return std::vector<std::smatch>(begin, end);
 }
 
 /**
