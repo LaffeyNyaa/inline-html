@@ -39,7 +39,7 @@ static const std::string SCRIPT_PATTERN =
     R"(<script[^>]*src=["']([^"']*)["'][^>]*></script>)";
 
 static std::string get_directory(const std::string &path) noexcept {
-    auto position = path.find_last_of("/\\");
+    const auto position = path.find_last_of("/\\");
 
     if (position == std::string::npos) {
         return "";
@@ -64,43 +64,43 @@ static std::string read_file(const std::string &path) {
  *         resources.
  */
 static std::string read_resource(std::int32_t id, LPCSTR type) {
-    auto module = GetModuleHandle(nullptr);
+    const auto module = GetModuleHandle(nullptr);
 
     if (module == nullptr) {
         std::error_code ec(GetLastError(), std::system_category());
         throw std::system_error(ec, "GetModuleHandle failed");
     }
 
-    auto handle = FindResource(module, MAKEINTRESOURCE(id), type);
+    const auto handle = FindResource(module, MAKEINTRESOURCE(id), type);
 
     if (handle == nullptr) {
         std::error_code ec(GetLastError(), std::system_category());
         throw std::system_error(ec, "FindResource failed");
     }
 
-    auto loaded = LoadResource(module, handle);
+    const auto loaded = LoadResource(module, handle);
 
     if (loaded == nullptr) {
         std::error_code ec(GetLastError(), std::system_category());
         throw std::system_error(ec, "LoadResource failed");
     }
 
-    auto locked = LockResource(loaded);
+    const auto locked = LockResource(loaded);
 
     if (locked == nullptr) {
         std::error_code ec(GetLastError(), std::system_category());
         throw std::system_error(ec, "LockResource failed");
     }
 
-    auto size = SizeofResource(module, handle);
+    const auto size = SizeofResource(module, handle);
     return std::string(static_cast<LPSTR>(locked), size);
 }
 
 static regex_match_vector get_regex_matches(
     const std::string &data, const std::string &pattern) noexcept {
-    std::regex regex(pattern, std::regex_constants::icase);
-    std::sregex_iterator begin(data.begin(), data.end(), regex);
-    std::sregex_iterator end;
+    const std::regex regex(pattern, std::regex_constants::icase);
+    const std::sregex_iterator begin(data.begin(), data.end(), regex);
+    const std::sregex_iterator end;
 
     return std::vector<std::smatch>(begin, end);
 }
@@ -113,14 +113,14 @@ static std::string inline_static_files(const regex_match_vector &smatches,
                                        const std::string &directory,
                                        std::string data,
                                        const std::string &wrapper_tag) {
-    auto reverse_begin = smatches.rbegin();
-    auto reverse_end = smatches.rend();
+    const auto reverse_begin = smatches.rbegin();
+    const auto reverse_end = smatches.rend();
 
     for (auto match = reverse_begin; match != reverse_end; ++match) {
-        auto position = match->position();
-        auto filename = (*match)[1].str();
-        auto len = (*match)[0].str().size();
-        auto path = directory + filename;
+        const auto position = match->position();
+        const auto filename = (*match)[1].str();
+        const auto len = (*match)[0].str().size();
+        const auto path = directory + filename;
         auto content = read_file(path);
         content = '<' + wrapper_tag + '>' + content + "</" + wrapper_tag + '>';
         data.replace(position, len, content);
@@ -139,17 +139,17 @@ static std::string inline_static_resources(const regex_match_vector &smatches,
                                            std::string data,
                                            const resource_map &res_map,
                                            const std::string &wrapper_tag) {
-    auto reverse_begin = smatches.rbegin();
-    auto reverse_end = smatches.rend();
+    const auto reverse_begin = smatches.rbegin();
+    const auto reverse_end = smatches.rend();
 
     for (auto match = reverse_begin; match != reverse_end; ++match) {
-        auto position = match->position();
-        auto filename = (*match)[1].str();
-        auto len = (*match)[0].str().size();
-        auto res_id = res_map.at(filename);
+        const auto position = match->position();
+        const auto filename = (*match)[1].str();
+        const auto length = (*match)[0].str().size();
+        const auto res_id = res_map.at(filename);
         auto content = read_resource(res_id, RT_RCDATA);
         content = '<' + wrapper_tag + '>' + content + "</" + wrapper_tag + '>';
-        data.replace(position, len, content);
+        data.replace(position, length, content);
     }
 
     return data;
