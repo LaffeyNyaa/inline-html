@@ -26,6 +26,7 @@
 
 #include <exception>
 #include <fstream>
+#include <iostream>
 #include <regex>
 #include <vector>
 
@@ -54,11 +55,7 @@ static std::string get_directory(const std::string &path) noexcept {
 static std::string read_file(const std::string &path) {
     std::ifstream file(path);
     file.exceptions(std::ios::failbit | std::ios::badbit);
-
-    std::istreambuf_iterator<char> begin(file);
-    std::istreambuf_iterator<char> end;
-
-    return std::string(begin, end);
+    return std::string(std::istreambuf_iterator<char>(file), {});
 }
 
 /**
@@ -98,8 +95,8 @@ static std::string read_resource(std::int32_t id, LPCSTR type) {
     return std::string(static_cast<LPSTR>(locked), size);
 }
 
-static regex_match_vector get_regex_matches(const std::string &data,
-                                       const std::string &pattern) noexcept {
+static regex_match_vector get_regex_matches(
+    const std::string &data, const std::string &pattern) noexcept {
     std::regex regex(pattern, std::regex_constants::icase);
     std::sregex_iterator begin(data.begin(), data.end(), regex);
     std::sregex_iterator end;
@@ -158,8 +155,7 @@ static std::string inline_static_resources(const regex_match_vector &smatches,
 }
 
 static std::string remove_all_cr(std::string data) noexcept {
-    auto iterator = std::remove(data.begin(), data.end(), '\r');
-    data.erase(iterator, data.end());
+    data.erase(std::remove(data.begin(), data.end(), '\r'), data.end());
     return data;
 }
 
