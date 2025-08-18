@@ -111,9 +111,9 @@ static regex_match_vector get_regex_matches(
  * @throws std::ios_base::failure If there's an error reading the HTML file or
  *         any of the referenced CSS/JS files.
  */
-static std::string inline_static_files(const regex_match_vector &smatches,
+static std::string inline_static_files(std::string data,
+                                       const regex_match_vector &smatches,
                                        const std::string &directory,
-                                       std::string data,
                                        const std::string &wrapper_tag) {
     const auto reverse_begin = smatches.rbegin();
     const auto reverse_end = smatches.rend();
@@ -137,8 +137,8 @@ static std::string inline_static_files(const regex_match_vector &smatches,
  * @throws std::system_error If a Windows API error occurs while loading
  *         resources.
  */
-static std::string inline_static_resources(const regex_match_vector &smatches,
-                                           std::string data,
+static std::string inline_static_resources(std::string data,
+                                           const regex_match_vector &smatches,
                                            const resource_map &res_map,
                                            const std::string &wrapper_tag) {
     const auto reverse_begin = smatches.rbegin();
@@ -167,10 +167,10 @@ std::string inline_html(const std::string &path) {
     auto data = read_file(path);
 
     const auto style_smatches = get_regex_matches(data, STYLE_PATTERN);
-    data = inline_static_files(style_smatches, directory, data, "style");
+    data = inline_static_files(data, style_smatches, directory, "style");
 
     const auto script_smatches = get_regex_matches(data, SCRIPT_PATTERN);
-    data = inline_static_files(script_smatches, directory, data, "script");
+    data = inline_static_files(data, script_smatches, directory, "script");
 
     return remove_all_cr(data);
 }
@@ -180,10 +180,10 @@ std::string inline_html(std::int32_t id, const resource_map &res_map) {
     auto data = read_resource(id, RT_HTML);
 
     const auto style_smatches = get_regex_matches(data, STYLE_PATTERN);
-    data = inline_static_resources(style_smatches, data, res_map, "style");
+    data = inline_static_resources(data, style_smatches, res_map, "style");
 
     const auto script_smatches = get_regex_matches(data, SCRIPT_PATTERN);
-    data = inline_static_resources(script_smatches, data, res_map, "script");
+    data = inline_static_resources(data, script_smatches, res_map, "script");
 
     return remove_all_cr(data);
 }
