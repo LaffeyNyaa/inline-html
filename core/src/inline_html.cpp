@@ -30,7 +30,7 @@
 #include <vector>
 
 namespace inline_html {
-using smatch_vector = std::vector<std::smatch>;
+using regex_match_vector = std::vector<std::smatch>;
 
 static const std::string STYLE_PATTERN =
     R"(<link[^>]*rel=["']stylesheet["'][^>]*href=["']([^"']*)["'][^>]*>)";
@@ -98,7 +98,7 @@ static std::string read_resource(std::int32_t id, LPCSTR type) {
     return std::string(static_cast<LPSTR>(locked), size);
 }
 
-static smatch_vector get_regex_matches(const std::string &data,
+static regex_match_vector get_regex_matches(const std::string &data,
                                        const std::string &pattern) noexcept {
     std::regex regex(pattern, std::regex_constants::icase);
     std::sregex_iterator begin(data.begin(), data.end(), regex);
@@ -111,7 +111,7 @@ static smatch_vector get_regex_matches(const std::string &data,
  * @throws std::ios_base::failure If there's an error reading the HTML file or
  *         any of the referenced CSS/JS files.
  */
-static std::string inline_static_files(const smatch_vector &smatches,
+static std::string inline_static_files(const regex_match_vector &smatches,
                                        const std::string &directory,
                                        std::string data,
                                        const std::string &wrapper_tag) {
@@ -137,7 +137,7 @@ static std::string inline_static_files(const smatch_vector &smatches,
  * @throws std::system_error If a Windows API error occurs while loading
  *         resources.
  */
-static std::string inline_static_resources(const smatch_vector &smatches,
+static std::string inline_static_resources(const regex_match_vector &smatches,
                                            std::string data,
                                            const resource_map &res_map,
                                            const std::string &wrapper_tag) {
