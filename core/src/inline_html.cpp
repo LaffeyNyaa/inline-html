@@ -59,6 +59,7 @@ static std::string read_file(const std::string &path) {
     return std::string(std::istreambuf_iterator<char>(file), {});
 }
 
+#ifdef WIN32
 /**
  * @throws std::system_error If a Windows API error occurs while loading
  *         resources.
@@ -95,6 +96,7 @@ static std::string read_resource(std::int32_t id, LPCSTR type) {
     const auto size = SizeofResource(module, handle);
     return std::string(static_cast<LPSTR>(locked), size);
 }
+#endif  // WIN32
 
 static regex_match_vector get_regex_matches(
     const std::string &data, const std::string &pattern) noexcept {
