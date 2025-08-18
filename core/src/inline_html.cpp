@@ -37,6 +37,8 @@ static const std::string STYLE_PATTERN =
     R"(<link[^>]*rel=["']stylesheet["'][^>]*href=["']([^"']*)["'][^>]*>)";
 static const std::string SCRIPT_PATTERN =
     R"(<script[^>]*src=["']([^"']*)["'][^>]*></script>)";
+static const std::string STYLE_TAG = "style";
+static const std::string SCRIPT_TAG = "script";
 
 static std::string get_directory(const std::string &path) noexcept {
     const auto position = path.find_last_of("/\\");
@@ -167,10 +169,10 @@ std::string inline_html(const std::string &path) {
     auto data = read_file(path);
 
     const auto style_smatches = get_regex_matches(data, STYLE_PATTERN);
-    data = inline_static_files(data, style_smatches, directory, "style");
+    data = inline_static_files(data, style_smatches, directory, STYLE_TAG);
 
     const auto script_smatches = get_regex_matches(data, SCRIPT_PATTERN);
-    data = inline_static_files(data, script_smatches, directory, "script");
+    data = inline_static_files(data, script_smatches, directory, SCRIPT_TAG);
 
     return remove_all_cr(data);
 }
@@ -180,10 +182,10 @@ std::string inline_html(std::int32_t id, const resource_map &res_map) {
     auto data = read_resource(id, RT_HTML);
 
     const auto style_smatches = get_regex_matches(data, STYLE_PATTERN);
-    data = inline_static_resources(data, style_smatches, res_map, "style");
+    data = inline_static_resources(data, style_smatches, res_map, STYLE_TAG);
 
     const auto script_smatches = get_regex_matches(data, SCRIPT_PATTERN);
-    data = inline_static_resources(data, script_smatches, res_map, "script");
+    data = inline_static_resources(data, script_smatches, res_map, SCRIPT_TAG);
 
     return remove_all_cr(data);
 }
