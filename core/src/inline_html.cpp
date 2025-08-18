@@ -32,6 +32,11 @@
 namespace inline_html {
 using smatch_vector = std::vector<std::smatch>;
 
+static const std::string STYLE_PATTERN =
+    R"(<link[^>]*rel=["']stylesheet["'][^>]*href=["']([^"']*)["'][^>]*>)";
+static const std::string SCRIPT_PATTERN =
+    R"(<script[^>]*src=["']([^"']*)["'][^>]*></script>)";
+
 static std::string get_directory(const std::string &path) noexcept {
     auto position = path.find_last_of("/\\");
 
@@ -164,14 +169,10 @@ std::string inline_html(const std::string &path) {
     auto directory = get_directory(path);
     auto data = read_file(path);
 
-    std::string style_pattern =
-        R"(<link[^>]*rel=["']stylesheet["'][^>]*href=["']([^"']*)["'][^>]*>)";
-    auto style_smatches = get_regex_matches(data, style_pattern);
+    auto style_smatches = get_regex_matches(data, STYLE_PATTERN);
     data = inline_static_files(style_smatches, directory, data, "style");
 
-    std::string script_pattern =
-        R"(<script[^>]*src=["']([^"']*)["'][^>]*></script>)";
-    auto script_smatches = get_regex_matches(data, script_pattern);
+    auto script_smatches = get_regex_matches(data, SCRIPT_PATTERN);
     data = inline_static_files(script_smatches, directory, data, "script");
 
     data = remove_all_cr(data);
@@ -182,14 +183,10 @@ std::string inline_html(const std::string &path) {
 std::string inline_html(std::int32_t id, const resource_map &res_map) {
     auto data = read_resource(id, RT_HTML);
 
-    std::string style_pattern =
-        R"(<link[^>]*rel=["']stylesheet["'][^>]*href=["']([^"']*)["'][^>]*>)";
-    auto style_smatches = get_regex_matches(data, style_pattern);
+    auto style_smatches = get_regex_matches(data, STYLE_PATTERN);
     data = inline_static_resources(style_smatches, data, res_map, "style");
 
-    std::string script_pattern =
-        R"(<script[^>]*src=["']([^"']*)["'][^>]*></script>)";
-    auto script_smatches = get_regex_matches(data, script_pattern);
+    auto script_smatches = get_regex_matches(data, SCRIPT_PATTERN);
     data = inline_static_resources(script_smatches, data, res_map, "script");
 
     data = remove_all_cr(data);
