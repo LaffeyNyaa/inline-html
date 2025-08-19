@@ -50,16 +50,14 @@ static const std::string TEST_SAMPLE = R"delimiter(<!DOCTYPE html>
 )delimiter";
 
 int main() {
-    std::string html_data;
-
     try {
-        html_data = inline_html::inline_html("res/index.html");
+        auto html_data = inline_html::inline_html("res/index.html");
+
+        if (html_data != TEST_SAMPLE) {
+            return 1;
+        }
     } catch (const std::ios_base::failure &e) {
         std::cerr << e.what() << '\n';
-        return 1;
-    }
-
-    if (html_data != TEST_SAMPLE) {
         return 1;
     }
 

@@ -36,10 +36,9 @@ static const inline_html::resource_map RESOURCE_MAP = {
 };
 
 int main() {
-    std::string html_data;
-
     try {
-        html_data = inline_html::inline_html(IDR_HTML_INDEX, RESOURCE_MAP);
+        auto html_data = inline_html::inline_html(IDR_HTML_INDEX, RESOURCE_MAP);
+        std::cout << html_data << '\n';
     } catch (const std::system_error &e) {
         std::cerr << e.code().message() << '\n';
         return 1;
@@ -47,8 +46,6 @@ int main() {
         std::cerr << e.what() << '\n';
         return 1;
     }
-
-    std::cout << html_data << '\n';
 
     return 0;
 }

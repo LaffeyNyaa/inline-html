@@ -27,16 +27,13 @@
 #include <iostream>
 
 int main() {
-    std::string html_data;
-
     try {
-        html_data = inline_html::inline_html("res/index.html");
+        auto html_data = inline_html::inline_html("res/index.html");
+        std::cout << html_data << '\n';
     } catch (std::ios_base::failure &e) {
         std::cerr << e.what() << '\n';
         return 1;
     }
-
-    std::cout << html_data << '\n';
 
     return 0;
 }
