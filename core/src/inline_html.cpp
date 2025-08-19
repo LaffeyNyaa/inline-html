@@ -71,28 +71,28 @@ static std::string read_resource(std::int32_t id, LPCSTR type) {
 
     if (module == nullptr) {
         std::error_code ec(GetLastError(), std::system_category());
-        throw std::system_error(ec, "GetModuleHandle failed");
+        throw std::system_error(ec);
     }
 
     const auto handle = FindResource(module, MAKEINTRESOURCE(id), type);
 
     if (handle == nullptr) {
         std::error_code ec(GetLastError(), std::system_category());
-        throw std::system_error(ec, "FindResource failed");
+        throw std::system_error(ec);
     }
 
     const auto loaded = LoadResource(module, handle);
 
     if (loaded == nullptr) {
         std::error_code ec(GetLastError(), std::system_category());
-        throw std::system_error(ec, "LoadResource failed");
+        throw std::system_error(ec);
     }
 
     const auto locked = LockResource(loaded);
 
     if (locked == nullptr) {
         std::error_code ec(GetLastError(), std::system_category());
-        throw std::system_error(ec, "LockResource failed");
+        throw std::system_error(ec);
     }
 
     const auto size = SizeofResource(module, handle);
