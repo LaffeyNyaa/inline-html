@@ -37,7 +37,7 @@ static const inline_html::resource_map RESOURCE_MAP = {
 
 int main() {
     try {
-        auto html_data = inline_html::inline_html(IDR_HTML_INDEX, RESOURCE_MAP);
+        const auto html_data = inline_html::inline_html(IDR_HTML_INDEX, RESOURCE_MAP);
         std::cout << html_data << '\n';
     } catch (const std::system_error &e) {
         std::cerr << e.code().message() << '\n';

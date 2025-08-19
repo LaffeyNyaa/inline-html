@@ -28,9 +28,9 @@
 
 int main() {
     try {
-        auto html_data = inline_html::inline_html("res/index.html");
+        const auto html_data = inline_html::inline_html("res/index.html");
         std::cout << html_data << '\n';
-    } catch (std::ios_base::failure &e) {
+    } catch (const std::ios_base::failure &e) {
         std::cerr << e.what() << '\n';
         return 1;
     }

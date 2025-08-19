@@ -51,7 +51,7 @@ static const std::string TEST_SAMPLE = R"delimiter(<!DOCTYPE html>
 
 int main() {
     try {
-        auto html_data = inline_html::inline_html("res/index.html");
+        const auto html_data = inline_html::inline_html("res/index.html");
 
         if (html_data != TEST_SAMPLE) {
             return 1;
