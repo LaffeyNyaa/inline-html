@@ -22,8 +22,7 @@
  * SOFTWARE.
  */
 
-#ifndef INLINE_HTML_H
-#define INLINE_HTML_H
+#pragma once
 
 #include <map>
 #include <string>
@@ -77,5 +76,3 @@ std::string inline_html(std::int32_t id, const resource_map &res_map);
 #endif  // WIN32
 
 }  // namespace inline_html
-
-#endif  // INLINE_HTML_H
