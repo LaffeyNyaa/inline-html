@@ -66,7 +66,7 @@ static std::string read_file(const std::string &path) {
  * @throws std::system_error If a Windows API error occurs while loading
  *         resources.
  */
-static std::string read_resource(std::int32_t id, LPCSTR type) {
+static std::string read_resource(const std::int32_t id, LPCSTR type) {
     const auto module = GetModuleHandle(nullptr);
 
     if (module == nullptr) {
@@ -178,7 +178,7 @@ std::string inline_html(const std::string &path) {
 }
 
 #ifdef WIN32
-std::string inline_html(std::int32_t id, const resource_map &res_map) {
+std::string inline_html(const std::int32_t id, const resource_map &res_map) {
     auto data = read_resource(id, RT_HTML);
 
     const auto style_smatches = get_regex_matches(data, STYLE_PATTERN);

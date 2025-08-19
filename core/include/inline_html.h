@@ -72,7 +72,7 @@ std::string inline_html(const std::string &path);
  * @throws std::out_of_range If a referenced filename is not found in the
  *         provided resource map.
  */
-std::string inline_html(std::int32_t id, const resource_map &res_map);
+std::string inline_html(const std::int32_t id, const resource_map &res_map);
 #endif  // WIN32
 
 }  // namespace inline_html
