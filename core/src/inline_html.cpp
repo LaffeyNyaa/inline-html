@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-#include "inline_html.h"
+#include "inline_html/inline_html.h"
 
 #include <exception>
 #include <fstream>
