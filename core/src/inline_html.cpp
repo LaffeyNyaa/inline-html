@@ -103,10 +103,9 @@ static std::string read_resource(const std::int32_t id, LPCSTR type) {
 static regex_match_vector get_regex_matches(
     const std::string &data, const std::string &pattern) noexcept {
     const std::regex regex(pattern, std::regex_constants::icase);
-    const std::sregex_iterator begin(data.begin(), data.end(), regex);
-    const std::sregex_iterator end;
 
-    return std::vector<std::smatch>(begin, end);
+    return std::vector<std::smatch>(
+        std::sregex_iterator(data.begin(), data.end(), regex), {});
 }
 
 /**
@@ -117,14 +116,13 @@ static std::string inline_static_files(std::string data,
                                        const regex_match_vector &smatches,
                                        const std::string &directory,
                                        const std::string &wrapper_tag) {
-    const auto reverse_begin = smatches.rbegin();
-    const auto reverse_end = smatches.rend();
-
-    for (auto match = reverse_begin; match != reverse_end; ++match) {
-        const auto position = match->position();
-        const auto filename = (*match)[1].str();
-        const auto len = (*match)[0].str().size();
+    for (auto match_iterator = smatches.rbegin();
+         match_iterator != smatches.rend(); ++match_iterator) {
+        const auto position = match_iterator->position();
+        const auto filename = (*match_iterator)[1].str();
+        const auto len = (*match_iterator)[0].str().size();
         const auto path = directory + filename;
+
         auto content = read_file(path);
         content = '<' + wrapper_tag + '>' + content + "</" + wrapper_tag + '>';
         data.replace(position, len, content);
