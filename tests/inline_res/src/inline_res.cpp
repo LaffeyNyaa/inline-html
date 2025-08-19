@@ -64,7 +64,7 @@ int main() {
     try {
         html_data = inline_html::inline_html(IDR_HTML_INDEX, RESOURCE_MAP);
     } catch (const std::system_error &e) {
-        std::cerr << e.what() << '\n';
+        std::cerr << e.code().message() << '\n';
         return 1;
     } catch (const std::out_of_range &e) {
         std::cerr << e.what() << '\n';
