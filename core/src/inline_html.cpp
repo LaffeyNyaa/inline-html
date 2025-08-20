@@ -66,7 +66,7 @@ static std::string read_file(const std::string &path) {
  * @throws std::system_error If a Windows API error occurs while loading
  *         resources.
  */
-static std::string read_resource(const std::int32_t id, LPCSTR type) {
+static std::string read_resource(const int id, LPCSTR type) {
     const auto module = GetModuleHandle(nullptr);
 
     if (module == nullptr) {
@@ -139,7 +139,7 @@ static std::string inline_static_files(std::string data,
  */
 static std::string inline_static_resources(std::string data,
                                            const regex_match_vector &smatches,
-                                           const resource_map &res_map,
+                                           const resource_map &resource_map,
                                            const std::string &wrapper_tag) {
     const auto reverse_begin = smatches.rbegin();
     const auto reverse_end = smatches.rend();
@@ -148,7 +148,7 @@ static std::string inline_static_resources(std::string data,
         const auto position = match->position();
         const auto filename = (*match)[1].str();
         const auto length = (*match)[0].str().size();
-        const auto res_id = res_map.at(filename);
+        const auto res_id = resource_map.at(filename);
         auto content = read_resource(res_id, RT_RCDATA);
         content = '<' + wrapper_tag + '>' + content + "</" + wrapper_tag + '>';
         data.replace(position, length, content);
@@ -176,14 +176,16 @@ std::string inline_html(const std::string &path) {
 }
 
 #ifdef WIN32
-std::string inline_html(const std::int32_t id, const resource_map &res_map) {
+std::string inline_html(const int id, const resource_map &resource_map) {
     auto data = read_resource(id, RT_HTML);
 
     const auto style_smatches = get_regex_matches(data, STYLE_PATTERN);
-    data = inline_static_resources(data, style_smatches, res_map, STYLE_TAG);
+    data =
+        inline_static_resources(data, style_smatches, resource_map, STYLE_TAG);
 
     const auto script_smatches = get_regex_matches(data, SCRIPT_PATTERN);
-    data = inline_static_resources(data, script_smatches, res_map, SCRIPT_TAG);
+    data = inline_static_resources(data, script_smatches, resource_map,
+                                   SCRIPT_TAG);
 
     return remove_all_cr(data);
 }
