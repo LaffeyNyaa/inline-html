@@ -74,5 +74,4 @@ std::string inline_html(const std::string &path);
  */
 std::string inline_html(const int id, const resource_map &resource_map);
 #endif  // WIN32
-
 }  // namespace inline_html
