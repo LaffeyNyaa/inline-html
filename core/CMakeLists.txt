@@ -10,6 +10,3 @@ if(MSVC)
   target_compile_definitions(inline_html PRIVATE _HAS_EXCEPTIONS=0)
 endif()
 
-if(WIN32)
-  target_compile_definitions(inline_html PUBLIC WIN32)
-endif()
