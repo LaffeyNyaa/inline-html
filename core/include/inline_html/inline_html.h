@@ -27,9 +27,9 @@
 #include <map>
 #include <string>
 
-#ifdef WIN32
+#ifdef _WIN32
 #include <Windows.h>
-#endif  // WIN32
+#endif  // _WIN32
 
 namespace inline_html {
 
@@ -52,7 +52,7 @@ using resource_map = std::map<std::string, int>;
  */
 std::string inline_html(const std::string &path);
 
-#ifdef WIN32
+#ifdef _WIN32
 /**
  * @brief Inlines CSS and JS resources into an HTML resource.
  *
@@ -73,5 +73,5 @@ std::string inline_html(const std::string &path);
  *         provided resource map.
  */
 std::string inline_html(const int id, const resource_map &resource_map);
-#endif  // WIN32
+#endif  // _WIN32
 }  // namespace inline_html

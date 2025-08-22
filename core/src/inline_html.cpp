@@ -61,7 +61,7 @@ static std::string read_file(const std::string &path) {
     return std::string(std::istreambuf_iterator<char>(file), {});
 }
 
-#ifdef WIN32
+#ifdef _WIN32
 /**
  * @throws std::system_error If a Windows API error occurs while loading
  *         resources.
@@ -98,7 +98,7 @@ static std::string read_resource(const int id, LPCSTR type) {
     const auto size = SizeofResource(module, handle);
     return std::string(static_cast<LPSTR>(locked), size);
 }
-#endif  // WIN32
+#endif  // _WIN32
 
 static regex_match_vector get_regex_matches(
     const std::string &data, const std::string &pattern) noexcept {
@@ -175,7 +175,7 @@ std::string inline_html(const std::string &path) {
     return remove_all_cr(data);
 }
 
-#ifdef WIN32
+#ifdef _WIN32
 std::string inline_html(const int id, const resource_map &resource_map) {
     auto data = read_resource(id, RT_HTML);
 
@@ -189,5 +189,5 @@ std::string inline_html(const int id, const resource_map &resource_map) {
 
     return remove_all_cr(data);
 }
-#endif  // WIN32
+#endif  // _WIN32
 }  // namespace inline_html
