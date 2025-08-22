@@ -62,7 +62,7 @@ std::string inline_html(const std::string &path);
  * document as `<style>` and `<script>` blocks respectively.
  *
  * @param id The resource ID of the HTML document to process.
- * @param res_map A mapping of resource filenames to their corresponding
+ * @param resource_map A mapping of resource filenames to their corresponding
  *                resource IDs for CSS and JS files.
  *
  * @return std::string The processed HTML document with CSS and JS inlined.
