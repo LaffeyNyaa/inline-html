@@ -1,5 +1,5 @@
-add_subdirectory("load_from_files")
+add_subdirectory("inline_files")
 
 if(WIN32)
-  add_subdirectory("load_from_res")
+  add_subdirectory("inline_res")
 endif()
