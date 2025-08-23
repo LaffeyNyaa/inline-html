@@ -22,44 +22,13 @@
  * SOFTWARE.
  */
 
-#include <inline_html/inline_html.h>
+#pragma once
 
-#include <iostream>
+#include <stdexcept>
 
-static const std::string TEST_SAMPLE = R"delimiter(<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>button {
-    border-radius: 8px;
-    background-color: aqua;
-    color: white;
-}
-</style>
-    <script>function showAlert() {
-    alert("You cliked me!");
-}
-</script>
-    <title>Document</title>
-</head>
-<body>
-    <button onclick="showAlert()">Click Me!</button>
-</body>
-</html>
-)delimiter";
-
-int main() {
-    try {
-        const auto html_data = inline_html::inline_html("res/index.html");
-
-        if (html_data != TEST_SAMPLE) {
-            return 1;
-        }
-    } catch (const std::ios_base::failure &e) {
-        std::cerr << e.what() << '\n';
-        return 1;
-    }
-
-    return 0;
-}
+namespace inline_html {
+class exception : public std::runtime_error {
+   public:
+    using runtime_error::runtime_error;
+};
+}  // namespace inline_html

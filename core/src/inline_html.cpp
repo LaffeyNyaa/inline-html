@@ -24,11 +24,12 @@
 
 #include "inline_html/inline_html.h"
 
-#include <exception>
 #include <fstream>
 #include <iostream>
 #include <regex>
 #include <vector>
+
+#include "inline_html/exception.h"
 
 namespace inline_html {
 using regex_match_vector = std::vector<std::smatch>;
@@ -40,22 +41,22 @@ static const std::string SCRIPT_PATTERN =
 static const std::string STYLE_TAG = "style";
 static const std::string SCRIPT_TAG = "script";
 
-static std::string get_directory(const std::string &path) noexcept {
-    const auto position = path.find_last_of("/\\");
+static std::string get_directory(const std::string_view file_path) noexcept {
+    const auto position = file_path.find_last_of("/\\");
 
     if (position == std::string::npos) {
         return "";
     }
 
-    return path.substr(0, position + 1);
+    return std::string(file_path.data(), file_path.data() + position + 1);
 }
 
 /**
- * @throws std::ios_base::failure If there's an error reading the HTML file or
+ * @throws std::ios::failure If there's an error reading the HTML file or
  *         any of the referenced CSS/JS files.
  */
-static std::string read_file(const std::string &path) {
-    std::ifstream file(path);
+static std::string read_file(const std::string_view file_path) {
+    std::ifstream file(file_path.data());
     file.exceptions(std::ios::failbit | std::ios::badbit);
 
     return std::string(std::istreambuf_iterator<char>(file), {});
@@ -101,57 +102,65 @@ static std::string read_resource(const int id, LPCSTR type) {
 #endif  // _WIN32
 
 static regex_match_vector get_regex_matches(
-    const std::string &data, const std::string &pattern) noexcept {
-    const std::regex regex(pattern, std::regex_constants::icase);
+    const std::string &data, const std::string_view pattern) noexcept {
+    const std::regex regex(pattern.data(), std::regex_constants::icase);
 
     return std::vector<std::smatch>(
         std::sregex_iterator(data.begin(), data.end(), regex), {});
 }
 
 /**
- * @throws std::ios_base::failure If there's an error reading the HTML file or
- *         any of the referenced CSS/JS files.
+ * @throws exception
  */
 static std::string inline_static_files(std::string data,
                                        const regex_match_vector &smatches,
-                                       const std::string &directory,
-                                       const std::string &wrapper_tag) {
+                                       const std::string_view directory,
+                                       const std::string_view wrapper_tag) {
     for (auto match_iterator = smatches.rbegin();
          match_iterator != smatches.rend(); ++match_iterator) {
         const auto position = match_iterator->position();
         const auto filename = (*match_iterator)[1].str();
-        const auto len = (*match_iterator)[0].str().size();
-        const auto path = directory + filename;
+        const auto element_length = (*match_iterator)[0].str().size();
+        const auto file_path = directory.data() + filename;
 
-        auto content = read_file(path);
-        content = '<' + wrapper_tag + '>' + content + "</" + wrapper_tag + '>';
-        data.replace(position, len, content);
+        try {
+            auto content = read_file(file_path);
+            content = std::string("<") + wrapper_tag.data() + ">" + content +
+                      "</" + wrapper_tag.data() + ">";
+            data.replace(position, element_length, content);
+        } catch (const std::ios::failure) {
+            throw exception("Failed to read the file: " + file_path);
+        }
     }
 
     return data;
 }
 
 /**
- * @throws std::out_of_range If a referenced filename is not found in the
- *         provided resource map.
- * @throws std::system_error If a Windows API error occurs while loading
- *         resources.
+ * @throws exception
  */
 static std::string inline_static_resources(std::string data,
                                            const regex_match_vector &smatches,
                                            const resource_map &resource_map,
-                                           const std::string &wrapper_tag) {
-    const auto reverse_begin = smatches.rbegin();
-    const auto reverse_end = smatches.rend();
-
-    for (auto match = reverse_begin; match != reverse_end; ++match) {
+                                           const std::string_view wrapper_tag) {
+    for (auto match = smatches.rbegin(); match != smatches.rend(); ++match) {
         const auto position = match->position();
         const auto filename = (*match)[1].str();
-        const auto length = (*match)[0].str().size();
-        const auto res_id = resource_map.at(filename);
-        auto content = read_resource(res_id, RT_RCDATA);
-        content = '<' + wrapper_tag + '>' + content + "</" + wrapper_tag + '>';
-        data.replace(position, length, content);
+        const auto element_length = (*match)[0].str().size();
+        try {
+            const auto resource_id = resource_map.at(filename);
+            auto content = read_resource(resource_id, RT_RCDATA);
+            content = std::string("<") + wrapper_tag.data() + ">" + content +
+                      "</" + wrapper_tag.data() + ">";
+            data.replace(position, element_length, content);
+        } catch (const std::out_of_range &e) {
+            throw exception("Failed to read the resource: " + filename + "\n" +
+                            "Out of range error: " + e.what());
+        }
+        catch (const std::system_error &e) {
+            throw exception("Failed to read the resource: " + filename + "\n" +
+                            "System error: " + e.code().message());
+        }
     }
 
     return data;
@@ -162,9 +171,9 @@ static std::string remove_all_cr(std::string data) noexcept {
     return data;
 }
 
-std::string inline_html(const std::string &path) {
-    auto directory = get_directory(path);
-    auto data = read_file(path);
+std::string inline_html(const std::string_view file_path) {
+    auto directory = get_directory(file_path);
+    auto data = read_file(file_path);
 
     const auto style_smatches = get_regex_matches(data, STYLE_PATTERN);
     data = inline_static_files(data, style_smatches, directory, STYLE_TAG);

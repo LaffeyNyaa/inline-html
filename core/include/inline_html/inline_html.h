@@ -43,14 +43,13 @@ using resource_map = std::map<std::string, int>;
  * embedding them directly into the HTML document as `<style>` and `<script>`
  * blocks respectively.
  *
- * @param path The file path to the HTML document to process.
+ * @param file_path The file file_path to the HTML document to process.
  *
  * @return std::string The processed HTML document with CSS and JS inlined.
  *
- * @throws std::ios_base::failure If there's an error reading the HTML file or
- *         any of the referenced CSS/JS files.
+ * @throws inline_html::exception
  */
-std::string inline_html(const std::string &path);
+std::string inline_html(const std::string_view file_path);
 
 #ifdef _WIN32
 /**
@@ -67,10 +66,7 @@ std::string inline_html(const std::string &path);
  *
  * @return std::string The processed HTML document with CSS and JS inlined.
  *
- * @throws std::system_error If a Windows API error occurs while loading
- *         resources.
- * @throws std::out_of_range If a referenced filename is not found in the
- *         provided resource map.
+ * @throws inline_html::exception
  */
 std::string inline_html(const int id, const resource_map &resource_map);
 #endif  // _WIN32
