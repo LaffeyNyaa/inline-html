@@ -1,14 +1,3 @@
-# Usage
-```
-include(FetchContent)
-
-FetchContent_Declare(
-    inline-html
-    GIT_REPOSITORY https://github.com/LaffeyNyaa/inline-html.git
-    GIT_TAG main)
-FetchContent_MakeAvailable(inline-html)
-```
-
 # Examples
 ## Inline files
 ```
