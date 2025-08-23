@@ -50,7 +50,7 @@ using resource_map = std::map<std::string, int>;
  * @throws std::ios_base::failure If there's an error reading the HTML file or
  *         any of the referenced CSS/JS files.
  */
-std::string inline_html(const std::string &file_path);
+std::string inline_html(const std::string_view file_path);
 
 #ifdef _WIN32
 /**
