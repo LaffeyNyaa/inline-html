@@ -43,14 +43,14 @@ using resource_map = std::map<std::string, int>;
  * embedding them directly into the HTML document as `<style>` and `<script>`
  * blocks respectively.
  *
- * @param path The file path to the HTML document to process.
+ * @param file_path The file file_path to the HTML document to process.
  *
  * @return std::string The processed HTML document with CSS and JS inlined.
  *
  * @throws std::ios_base::failure If there's an error reading the HTML file or
  *         any of the referenced CSS/JS files.
  */
-std::string inline_html(const std::string &path);
+std::string inline_html(const std::string &file_path);
 
 #ifdef _WIN32
 /**

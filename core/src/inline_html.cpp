@@ -162,9 +162,9 @@ static std::string remove_all_cr(std::string data) noexcept {
     return data;
 }
 
-std::string inline_html(const std::string &path) {
-    auto directory = get_directory(path);
-    auto data = read_file(path);
+std::string inline_html(const std::string &file_path) {
+    auto directory = get_directory(file_path);
+    auto data = read_file(file_path);
 
     const auto style_smatches = get_regex_matches(data, STYLE_PATTERN);
     data = inline_static_files(data, style_smatches, directory, STYLE_TAG);
