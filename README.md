@@ -10,8 +10,9 @@ FetchContent_MakeAvailable(inline-html)
 ```
 
 # Examples
-## Load from HTML file
+## Inline files
 ```
+#include <inline_html/exception.h>
 #include <inline_html/inline_html.h>
 
 #include <iostream>
@@ -19,17 +20,18 @@ FetchContent_MakeAvailable(inline-html)
 int main() {
     try {
         const auto html_data = inline_html::inline_html("res/index.html");
-        std::cout << html_data << '\n';
-    } catch (const std::ios_base::failure &e) {
-        std::cerr << e.what() << '\n';
+        std::cout << html_data << "\n";
+    } catch (const inline_html::exception &e) {
+        std::cerr << e.what() << "\n";
         return 1;
     }
 
     return 0;
 }
 ```
-## Load from .rc file
+## Inline resources
 ```
+#include <inline_html/exception.h>
 #include <inline_html/inline_html.h>
 
 #include <iostream>
@@ -45,13 +47,11 @@ static const inline_html::resource_map RESOURCE_MAP = {
 
 int main() {
     try {
-        const auto html_data = inline_html::inline_html(IDR_HTML_INDEX, RESOURCE_MAP);
-        std::cout << html_data << '\n';
-    } catch (const std::system_error &e) {
-        std::cerr << e.code().message() << '\n';
-        return 1;
-    } catch (const std::out_of_range &e) {
-        std::cerr << e.what() << '\n';
+        const auto html_data =
+            inline_html::inline_html(IDR_HTML_INDEX, RESOURCE_MAP);
+        std::cout << html_data << "\n";
+    } catch (const inline_html::exception &e) {
+        std::cerr << e.what() << "\n";
         return 1;
     }
 
