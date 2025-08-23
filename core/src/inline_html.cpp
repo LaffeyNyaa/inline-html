@@ -24,11 +24,12 @@
 
 #include "inline_html/inline_html.h"
 
-#include <exception>
 #include <fstream>
 #include <iostream>
 #include <regex>
 #include <vector>
+
+#include "inline_html/exception.h"
 
 namespace inline_html {
 using regex_match_vector = std::vector<std::smatch>;
@@ -51,7 +52,7 @@ static std::string get_directory(const std::string_view file_path) noexcept {
 }
 
 /**
- * @throws std::ios_base::failure If there's an error reading the HTML file or
+ * @throws std::ios::failure If there's an error reading the HTML file or
  *         any of the referenced CSS/JS files.
  */
 static std::string read_file(const std::string_view file_path) {
@@ -109,8 +110,7 @@ static regex_match_vector get_regex_matches(
 }
 
 /**
- * @throws std::ios_base::failure If there's an error reading the HTML file or
- *         any of the referenced CSS/JS files.
+ * @throws exception
  */
 static std::string inline_static_files(std::string data,
                                        const regex_match_vector &smatches,
@@ -120,40 +120,47 @@ static std::string inline_static_files(std::string data,
          match_iterator != smatches.rend(); ++match_iterator) {
         const auto position = match_iterator->position();
         const auto filename = (*match_iterator)[1].str();
-        const auto len = (*match_iterator)[0].str().size();
-        const auto path = directory.data() + filename;
+        const auto element_length = (*match_iterator)[0].str().size();
+        const auto file_path = directory.data() + filename;
 
-        auto content = read_file(path);
-        content = std::string("<") + wrapper_tag.data() + ">" + content + "</" +
-                  wrapper_tag.data() + ">";
-        data.replace(position, len, content);
+        try {
+            auto content = read_file(file_path);
+            content = std::string("<") + wrapper_tag.data() + ">" + content +
+                      "</" + wrapper_tag.data() + ">";
+            data.replace(position, element_length, content);
+        } catch (const std::ios::failure) {
+            throw exception("Failed to read the file: " + file_path);
+        }
     }
 
     return data;
 }
 
 /**
- * @throws std::out_of_range If a referenced filename is not found in the
- *         provided resource map.
- * @throws std::system_error If a Windows API error occurs while loading
- *         resources.
+ * @throws exception
  */
 static std::string inline_static_resources(std::string data,
                                            const regex_match_vector &smatches,
                                            const resource_map &resource_map,
                                            const std::string_view wrapper_tag) {
-    const auto reverse_begin = smatches.rbegin();
-    const auto reverse_end = smatches.rend();
-
-    for (auto match = reverse_begin; match != reverse_end; ++match) {
+    for (auto match = smatches.rbegin(); match != smatches.rend(); ++match) {
         const auto position = match->position();
         const auto filename = (*match)[1].str();
-        const auto length = (*match)[0].str().size();
-        const auto res_id = resource_map.at(filename);
-        auto content = read_resource(res_id, RT_RCDATA);
-        content = std::string("<") + wrapper_tag.data() + ">" + content + "</" +
-                  wrapper_tag.data() + ">";
-        data.replace(position, length, content);
+        const auto element_length = (*match)[0].str().size();
+        try {
+            const auto resource_id = resource_map.at(filename);
+            auto content = read_resource(resource_id, RT_RCDATA);
+            content = std::string("<") + wrapper_tag.data() + ">" + content +
+                      "</" + wrapper_tag.data() + ">";
+            data.replace(position, element_length, content);
+        } catch (const std::out_of_range &e) {
+            throw exception("Failed to read the resource: " + filename + "\n" +
+                            "Out of range error: " + e.what());
+        }
+        catch (const std::system_error &e) {
+            throw exception("Failed to read the resource: " + filename + "\n" +
+                            "System error: " + e.code().message());
+        }
     }
 
     return data;

@@ -22,6 +22,7 @@
  * SOFTWARE.
  */
 
+#include <inline_html/exception.h>
 #include <inline_html/inline_html.h>
 
 #include <iostream>
@@ -29,9 +30,9 @@
 int main() {
     try {
         const auto html_data = inline_html::inline_html("res/index.html");
-        std::cout << html_data << '\n';
-    } catch (const std::ios_base::failure &e) {
-        std::cerr << e.what() << '\n';
+        std::cout << html_data << "\n";
+    } catch (const inline_html::exception &e) {
+        std::cerr << e.what() << "\n";
         return 1;
     }
 
