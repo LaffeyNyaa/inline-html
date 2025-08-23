@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION "3.31")
-project("inline-html")
+project("inline_html")
 
 enable_testing()
 
