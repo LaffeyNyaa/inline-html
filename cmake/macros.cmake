@@ -4,7 +4,7 @@ macro(add_example_target EXAMPLE_NAME SRCS)
   target_link_libraries("${EXAMPLE_NAME}" PRIVATE "${PROJECT_NAME}")
   target_compile_features("${EXAMPLE_NAME}" PRIVATE cxx_std_20)
 
-  if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+  if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     target_compile_options("${EXAMPLE_NAME}" PRIVATE "-Wall")
   elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     target_compile_options("${EXAMPLE_NAME}" PRIVATE "/W4")
