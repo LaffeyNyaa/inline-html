@@ -10,4 +10,3 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
   target_compile_options("inline_html" PRIVATE "/W4")
 endif()
-
