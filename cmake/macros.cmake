@@ -3,7 +3,7 @@ macro(add_example_target EXAMPLE_NAME SRCS)
   set_target_properties("${EXAMPLE_NAME}" PROPERTIES CXX_STANDARD 20)
   target_include_directories("${EXAMPLE_NAME}" PRIVATE "${INLINE_HTML_INCLUDE_DIR}"
                                              include)
-  target_link_libraries("${EXAMPLE_NAME}" PRIVATE "inline_html")
+  target_link_libraries("${EXAMPLE_NAME}" PRIVATE "${PROJECT_NAME}")
   target_compile_features("${EXAMPLE_NAME}" PRIVATE cxx_std_20)
 
   if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
