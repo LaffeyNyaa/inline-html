@@ -1,4 +1,4 @@
-set(SRCS "src/inline_html.cpp")
+file(GLOB_RECURSE SRCS "src/*")
 
 add_library("${PROJECT_NAME}" "${SRCS}")
 set_target_properties("${PROJECT_NAME}" PROPERTIES CXX_STANDARD 20)
