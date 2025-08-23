@@ -40,22 +40,22 @@ static const std::string SCRIPT_PATTERN =
 static const std::string STYLE_TAG = "style";
 static const std::string SCRIPT_TAG = "script";
 
-static std::string get_directory(const std::string_view path) noexcept {
-    const auto position = path.find_last_of("/\\");
+static std::string get_directory(const std::string_view file_path) noexcept {
+    const auto position = file_path.find_last_of("/\\");
 
     if (position == std::string::npos) {
         return "";
     }
 
-    return std::string(path.data(), path.data() + position + 1);
+    return std::string(file_path.data(), file_path.data() + position + 1);
 }
 
 /**
  * @throws std::ios_base::failure If there's an error reading the HTML file or
  *         any of the referenced CSS/JS files.
  */
-static std::string read_file(const std::string_view path) {
-    std::ifstream file(path.data());
+static std::string read_file(const std::string_view file_path) {
+    std::ifstream file(file_path.data());
     file.exceptions(std::ios::failbit | std::ios::badbit);
 
     return std::string(std::istreambuf_iterator<char>(file), {});
