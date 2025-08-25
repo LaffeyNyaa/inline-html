@@ -41,7 +41,9 @@ static const std::string TEST_SAMPLE = R"delimiter(<!DOCTYPE html>
     color: white;
 }
 </style>
-    <script>function showAlert() {
+    <script>// For demo
+
+function showAlert() {
     alert("You cliked me!");
 }
 </script>

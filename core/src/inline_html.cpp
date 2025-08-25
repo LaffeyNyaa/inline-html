@@ -52,8 +52,7 @@ static std::string get_directory(const std::string_view file_path) noexcept {
 }
 
 /**
- * @throws std::ios::failure If there's an error reading the HTML file or
- *         any of the referenced CSS/JS files.
+ * @throws std::ios::failure
  */
 static std::string read_file(const std::string_view file_path) {
     std::ifstream file(file_path.data());
@@ -64,10 +63,9 @@ static std::string read_file(const std::string_view file_path) {
 
 #ifdef _WIN32
 /**
- * @throws std::system_error If a Windows API error occurs while loading
- *         resources.
+ * @throws std::system_error
  */
-static std::string read_resource(const int id, LPCSTR type) {
+static std::string read_resource(const int32_t id, LPCSTR type) {
     const auto module = GetModuleHandle(nullptr);
 
     if (module == nullptr) {
@@ -143,10 +141,12 @@ static std::string inline_static_resources(std::string data,
                                            const regex_match_vector &smatches,
                                            const resource_map &resource_map,
                                            const std::string_view wrapper_tag) {
-    for (auto match = smatches.rbegin(); match != smatches.rend(); ++match) {
-        const auto position = match->position();
-        const auto filename = (*match)[1].str();
-        const auto element_length = (*match)[0].str().size();
+    for (auto match_iterator = smatches.rbegin();
+         match_iterator != smatches.rend(); ++match_iterator) {
+        const auto position = match_iterator->position();
+        const auto filename = (*match_iterator)[1].str();
+        const auto element_length = (*match_iterator)[0].str().size();
+
         try {
             const auto resource_id = resource_map.at(filename);
             auto content = read_resource(resource_id, RT_RCDATA);
@@ -156,8 +156,7 @@ static std::string inline_static_resources(std::string data,
         } catch (const std::out_of_range &e) {
             throw exception("Failed to read the resource: " + filename + "\n" +
                             "Out of range error: " + e.what());
-        }
-        catch (const std::system_error &e) {
+        } catch (const std::system_error &e) {
             throw exception("Failed to read the resource: " + filename + "\n" +
                             "System error: " + e.code().message());
         }
