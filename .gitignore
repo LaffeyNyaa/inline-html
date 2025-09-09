@@ -1,2 +1,6 @@
 .*
 build
+
+!.gitignore
+!.clang-format
+!.cmake-format.json
