@@ -1,5 +1,5 @@
 # Examples
-## Inline files
+## Inline Files
 ```
 #include <inline_html/exception.h>
 #include <inline_html/inline_html.h>
@@ -18,7 +18,7 @@ int main() {
     return 0;
 }
 ```
-## Inline resources
+## Inline Resources
 ```
 #include <inline_html/exception.h>
 #include <inline_html/inline_html.h>
