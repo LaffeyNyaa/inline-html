@@ -30,7 +30,7 @@
 
 #include "resource.h"
 
-static const inline_html::resource_map RESOURCE_MAP = {
+static const inline_html::res_map RESOURCE_MAP = {
     {"index.html", IDR_HTML_INDEX},
     {"style.css", IDR_CSS_STYLE},
     {"script.js", IDR_JS_SCRIPT},

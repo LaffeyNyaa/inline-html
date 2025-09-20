@@ -33,7 +33,7 @@
 
 namespace inline_html {
 
-using resource_map = std::map<std::string, int>;
+using res_map = std::map<std::string, int>;
 
 /**
  * @brief Inlines external CSS and JS files into an HTML document.
@@ -43,13 +43,13 @@ using resource_map = std::map<std::string, int>;
  * embedding them directly into the HTML document as `<style>` and `<script>`
  * blocks respectively.
  *
- * @param file_path The file file_path to the HTML document to process.
+ * @param path The file file_path to the HTML document to process.
  *
  * @return std::string The processed HTML document with CSS and JS inlined.
  *
  * @throws inline_html::exception
  */
-std::string inline_html(const std::string_view file_path);
+std::string inline_html(const std::string_view path);
 
 #ifdef _WIN32
 /**
@@ -61,13 +61,13 @@ std::string inline_html(const std::string_view file_path);
  * document as `<style>` and `<script>` blocks respectively.
  *
  * @param id The resource ID of the HTML document to process.
- * @param resource_map A mapping of resource filenames to their corresponding
+ * @param map A mapping of resource filenames to their corresponding
  *                resource IDs for CSS and JS files.
  *
  * @return std::string The processed HTML document with CSS and JS inlined.
  *
  * @throws inline_html::exception
  */
-std::string inline_html(const int id, const resource_map &resource_map);
+std::string inline_html(const int id, const res_map &map);
 #endif  // _WIN32
 }  // namespace inline_html
