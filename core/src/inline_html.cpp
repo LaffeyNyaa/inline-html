@@ -35,9 +35,9 @@ namespace inline_html {
 using smatches = std::vector<std::smatch>;
 
 static const std::string STYLE_PATTERN =
-    R"(<link[^>]*rel=["']stylesheet["'][^>]*href=["']([^"']*)["'][^>]*>)";
+    R"(<link([^>]*?)rel=["']stylesheet["']([^>]*?)href=["']([^"']*)["']([^>]*?)>)";
 static const std::string SCRIPT_PATTERN =
-    R"(<script[^>]*src=["']([^"']*)["'][^>]*></script>)";
+    R"(<script([^>]*?)src=["']([^"']*)["']([^>]*?)>(.*)</script>)";
 static const std::string STYLE_TAG = "style";
 static const std::string SCRIPT_TAG = "script";
 
@@ -114,18 +114,62 @@ static std::string inline_files(std::string data, const smatches &smatches,
                                 const std::string_view tag) {
     for (auto iter = smatches.rbegin(); iter != smatches.rend(); ++iter) {
         const auto pos = iter->position();
-        const auto filename = (*iter)[1].str();
-        const auto element_len = (*iter)[0].str().size();
-        const auto path = dir.data() + filename;
+        std::string content;
+        size_t element_len;
 
-        try {
-            auto content = read_file(path);
-            content = std::string("<") + tag.data() + ">" + content + "</" +
-                      tag.data() + ">";
-            data.replace(pos, element_len, content);
-        } catch (const std::ios::failure) {
-            throw exception("Failed to read the file: " + path);
+        if (tag == SCRIPT_TAG) {
+            auto prefix_attrs = (*iter)[1].str();
+            const auto filename = (*iter)[2].str();
+            auto suffix_attrs = (*iter)[3].str();
+            const auto inner_content = (*iter)[4].str();
+            element_len = (*iter)[0].str().size();
+            const auto path = dir.data() + filename;
+
+            if (prefix_attrs == " ") {
+                prefix_attrs.clear();
+            }
+
+            if (suffix_attrs == " ") {
+                suffix_attrs.clear();
+            }
+
+            try {
+                content = read_file(path);
+                content = std::string("<script") + prefix_attrs + suffix_attrs +
+                          ">" + content + "</script>";
+            } catch (const std::ios::failure) {
+                throw exception("Failed to read file: " + path);
+            }
+        } else {
+            auto prefix_attrs = (*iter)[1].str();
+            auto middle_attrs = (*iter)[2].str();
+            const auto filename = (*iter)[3].str();
+            auto suffix_attrs = (*iter)[4].str();
+            element_len = (*iter)[0].str().size();
+            const auto path = dir.data() + filename;
+
+            if (prefix_attrs == " ") {
+                prefix_attrs.clear();
+            }
+
+            if (middle_attrs == " ") {
+                middle_attrs.clear();
+            }
+
+            if (suffix_attrs == " ") {
+                suffix_attrs.clear();
+            }
+
+            try {
+                content = read_file(path);
+                content = "<style" + prefix_attrs + middle_attrs +
+                          suffix_attrs + ">" + content + "</style>";
+            } catch (const std::ios::failure) {
+                throw exception("Failed to read file: " + path);
+            }
         }
+
+        data.replace(pos, element_len, content);
     }
 
     return data;
@@ -138,22 +182,70 @@ static std::string inline_res(std::string data, const smatches &smatches,
                               const res_map &map, const std::string_view tag) {
     for (auto iter = smatches.rbegin(); iter != smatches.rend(); ++iter) {
         const auto pos = iter->position();
-        const auto filename = (*iter)[1].str();
-        const auto element_len = (*iter)[0].str().size();
+        std::string content;
+        size_t element_len;
 
-        try {
-            const auto res_id = map.at(filename);
-            auto content = read_res(res_id, RT_RCDATA);
-            content = std::string("<") + tag.data() + ">" + content + "</" +
-                      tag.data() + ">";
-            data.replace(pos, element_len, content);
-        } catch (const std::out_of_range &e) {
-            throw exception("Failed to read the resource: " + filename + "\n" +
-                            "Out of range error: " + e.what());
-        } catch (const std::system_error &e) {
-            throw exception("Failed to read the resource: " + filename + "\n" +
-                            "System error: " + e.code().message());
+        if (tag == SCRIPT_TAG) {
+            auto prefix_attrs = (*iter)[1].str();
+            const auto filename = (*iter)[2].str();
+            auto suffix_attrs = (*iter)[3].str();
+            const auto inner_content = (*iter)[4].str();
+            element_len = (*iter)[0].str().size();
+
+            if (prefix_attrs == " ") {
+                prefix_attrs.clear();
+            }
+
+            if (suffix_attrs == " ") {
+                suffix_attrs.clear();
+            }
+
+            try {
+                const auto res_id = map.at(filename);
+                content = read_res(res_id, RT_RCDATA);
+                content = "<script" + prefix_attrs + suffix_attrs + ">" +
+                          content + "</script>";
+            } catch (const std::out_of_range &e) {
+                throw exception("Failed to read resource: " + filename + "\n" +
+                                "Out of range error: " + e.what());
+            } catch (const std::system_error &e) {
+                throw exception("Failed to read resource: " + filename + "\n" +
+                                "System error: " + e.code().message());
+            }
+        } else {
+            auto prefix_attrs = (*iter)[1].str();
+            auto middle_attrs = (*iter)[2].str();
+            const auto filename = (*iter)[3].str();
+            auto suffix_attrs = (*iter)[4].str();
+            element_len = (*iter)[0].str().size();
+
+            if (prefix_attrs == " ") {
+                prefix_attrs.clear();
+            }
+
+            if (middle_attrs == " ") {
+                middle_attrs.clear();
+            }
+
+            if (suffix_attrs == " ") {
+                suffix_attrs.clear();
+            }
+
+            try {
+                const auto res_id = map.at(filename);
+                content = read_res(res_id, RT_RCDATA);
+                content = std::string("<style") + prefix_attrs + middle_attrs +
+                          suffix_attrs + ">" + content + "</style>";
+            } catch (const std::out_of_range &e) {
+                throw exception("Failed to read resource: " + filename + "\n" +
+                                "Out of range error: " + e.what());
+            } catch (const std::system_error &e) {
+                throw exception("Failed to read resource: " + filename + "\n" +
+                                "System error: " + e.code().message());
+            }
         }
+
+        data.replace(pos, element_len, content);
     }
 
     return data;
@@ -166,28 +258,38 @@ static std::string remove_all_cr(std::string data) noexcept {
 
 std::string inline_html(const std::string_view path) {
     auto directory = get_dir(path);
-    auto data = read_file(path);
 
-    const auto style_smatches = get_smatches(data, STYLE_PATTERN);
-    data = inline_files(data, style_smatches, directory, STYLE_TAG);
+    try {
+        auto data = read_file(path);
 
-    const auto script_smatches = get_smatches(data, SCRIPT_PATTERN);
-    data = inline_files(data, script_smatches, directory, SCRIPT_TAG);
+        const auto style_smatches = get_smatches(data, STYLE_PATTERN);
+        data = inline_files(data, style_smatches, directory, STYLE_TAG);
 
-    return remove_all_cr(data);
+        const auto script_smatches = get_smatches(data, SCRIPT_PATTERN);
+        data = inline_files(data, script_smatches, directory, SCRIPT_TAG);
+
+        return remove_all_cr(data);
+    } catch (const std::ios::failure) {
+        throw exception("Failed to read file: " + std::string(path));
+    }
 }
 
 #ifdef _WIN32
 std::string inline_html(const int id, const res_map &map) {
-    auto data = read_res(id, RT_HTML);
+    try {
+        auto data = read_res(id, RT_HTML);
 
-    const auto style_smatches = get_smatches(data, STYLE_PATTERN);
-    data = inline_res(data, style_smatches, map, STYLE_TAG);
+        const auto style_smatches = get_smatches(data, STYLE_PATTERN);
+        data = inline_res(data, style_smatches, map, STYLE_TAG);
 
-    const auto script_smatches = get_smatches(data, SCRIPT_PATTERN);
-    data = inline_res(data, script_smatches, map, SCRIPT_TAG);
+        const auto script_smatches = get_smatches(data, SCRIPT_PATTERN);
+        data = inline_res(data, script_smatches, map, SCRIPT_TAG);
 
-    return remove_all_cr(data);
+        return remove_all_cr(data);
+    } catch (const std::system_error &e) {
+        throw exception("Failed to read resource: " + std::to_string(id) +
+                        "\n" + "System error: " + e.code().message());
+    }
 }
 #endif  // _WIN32
 }  // namespace inline_html

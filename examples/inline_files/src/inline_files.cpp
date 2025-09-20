@@ -29,7 +29,7 @@
 
 int main() {
     try {
-        const auto html_data = inline_html::inline_html("res/index.html");
+        const auto html_data = inline_html::inline_html("../res/index.html");
         std::cout << html_data << "\n";
     } catch (const inline_html::exception &e) {
         std::cerr << e.what() << "\n";
