@@ -39,7 +39,7 @@ static const std::string STYLE_PATTERN =
 static const std::string SCRIPT_PATTERN =
     R"(<script[^>]*src=["']([^"']*)["'][^>]*></script>)";
 static const std::string STYLE_TAG = "style";
-static const std::string SCRIPT_TAG = "script";
+static const std::string SCRIPT_TAG = "script type=\"module\"";
 
 static std::string get_directory(const std::string_view file_path) noexcept {
     const auto position = file_path.find_last_of("/\\");
