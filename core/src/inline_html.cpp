@@ -41,7 +41,7 @@ static const std::string SCRIPT_PATTERN =
 static const std::string STYLE_TAG = "style";
 static const std::string SCRIPT_TAG = "script";
 
-static std::string get_directory(const std::string_view path) noexcept {
+static std::string get_dir(const std::string_view path) noexcept {
     const auto position = path.find_last_of("/\\");
 
     if (position == std::string::npos) {
@@ -65,7 +65,7 @@ static std::string read_file(const std::string_view path) {
 /**
  * @throws std::system_error
  */
-static std::string read_resource(const int32_t id, LPCSTR type) {
+static std::string read_res(const int32_t id, LPCSTR type) {
     const auto module = GetModuleHandle(nullptr);
 
     if (module == nullptr) {
@@ -109,10 +109,9 @@ static smatches get_smatches(const std::string &data,
 /**
  * @throws exception
  */
-static std::string inline_static_files(std::string data,
-                                       const smatches &smatches,
-                                       const std::string_view dir,
-                                       const std::string_view tag) {
+static std::string inline_files(std::string data, const smatches &smatches,
+                                const std::string_view dir,
+                                const std::string_view tag) {
     for (auto iter = smatches.rbegin(); iter != smatches.rend(); ++iter) {
         const auto position = iter->position();
         const auto filename = (*iter)[1].str();
@@ -135,10 +134,8 @@ static std::string inline_static_files(std::string data,
 /**
  * @throws exception
  */
-static std::string inline_static_resources(std::string data,
-                                           const smatches &smatches,
-                                           const res_map &map,
-                                           const std::string_view tag) {
+static std::string inline_res(std::string data, const smatches &smatches,
+                              const res_map &map, const std::string_view tag) {
     for (auto iter = smatches.rbegin(); iter != smatches.rend(); ++iter) {
         const auto position = iter->position();
         const auto filename = (*iter)[1].str();
@@ -146,7 +143,7 @@ static std::string inline_static_resources(std::string data,
 
         try {
             const auto resource_id = map.at(filename);
-            auto content = read_resource(resource_id, RT_RCDATA);
+            auto content = read_res(resource_id, RT_RCDATA);
             content = std::string("<") + tag.data() + ">" + content + "</" +
                       tag.data() + ">";
             data.replace(position, element_length, content);
@@ -168,27 +165,27 @@ static std::string remove_all_cr(std::string data) noexcept {
 }
 
 std::string inline_html(const std::string_view path) {
-    auto directory = get_directory(path);
+    auto directory = get_dir(path);
     auto data = read_file(path);
 
     const auto style_smatches = get_smatches(data, STYLE_PATTERN);
-    data = inline_static_files(data, style_smatches, directory, STYLE_TAG);
+    data = inline_files(data, style_smatches, directory, STYLE_TAG);
 
     const auto script_smatches = get_smatches(data, SCRIPT_PATTERN);
-    data = inline_static_files(data, script_smatches, directory, SCRIPT_TAG);
+    data = inline_files(data, script_smatches, directory, SCRIPT_TAG);
 
     return remove_all_cr(data);
 }
 
 #ifdef _WIN32
 std::string inline_html(const int id, const res_map &map) {
-    auto data = read_resource(id, RT_HTML);
+    auto data = read_res(id, RT_HTML);
 
     const auto style_smatches = get_smatches(data, STYLE_PATTERN);
-    data = inline_static_resources(data, style_smatches, map, STYLE_TAG);
+    data = inline_res(data, style_smatches, map, STYLE_TAG);
 
     const auto script_smatches = get_smatches(data, SCRIPT_PATTERN);
-    data = inline_static_resources(data, script_smatches, map, SCRIPT_TAG);
+    data = inline_res(data, script_smatches, map, SCRIPT_TAG);
 
     return remove_all_cr(data);
 }
