@@ -42,13 +42,13 @@ static const std::string STYLE_TAG = "style";
 static const std::string SCRIPT_TAG = "script";
 
 static std::string get_dir(const std::string_view path) noexcept {
-    const auto position = path.find_last_of("/\\");
+    const auto pos = path.find_last_of("/\\");
 
-    if (position == std::string::npos) {
+    if (pos == std::string::npos) {
         return "";
     }
 
-    return std::string(path.data(), path.data() + position + 1);
+    return std::string(path.data(), path.data() + pos + 1);
 }
 
 /**
@@ -113,16 +113,16 @@ static std::string inline_files(std::string data, const smatches &smatches,
                                 const std::string_view dir,
                                 const std::string_view tag) {
     for (auto iter = smatches.rbegin(); iter != smatches.rend(); ++iter) {
-        const auto position = iter->position();
+        const auto pos = iter->position();
         const auto filename = (*iter)[1].str();
-        const auto element_length = (*iter)[0].str().size();
+        const auto element_len = (*iter)[0].str().size();
         const auto file_path = dir.data() + filename;
 
         try {
             auto content = read_file(file_path);
             content = std::string("<") + tag.data() + ">" + content + "</" +
                       tag.data() + ">";
-            data.replace(position, element_length, content);
+            data.replace(pos, element_len, content);
         } catch (const std::ios::failure) {
             throw exception("Failed to read the file: " + file_path);
         }
@@ -137,16 +137,16 @@ static std::string inline_files(std::string data, const smatches &smatches,
 static std::string inline_res(std::string data, const smatches &smatches,
                               const res_map &map, const std::string_view tag) {
     for (auto iter = smatches.rbegin(); iter != smatches.rend(); ++iter) {
-        const auto position = iter->position();
+        const auto pos = iter->position();
         const auto filename = (*iter)[1].str();
-        const auto element_length = (*iter)[0].str().size();
+        const auto element_len = (*iter)[0].str().size();
 
         try {
             const auto resource_id = map.at(filename);
             auto content = read_res(resource_id, RT_RCDATA);
             content = std::string("<") + tag.data() + ">" + content + "</" +
                       tag.data() + ">";
-            data.replace(position, element_length, content);
+            data.replace(pos, element_len, content);
         } catch (const std::out_of_range &e) {
             throw exception("Failed to read the resource: " + filename + "\n" +
                             "Out of range error: " + e.what());
